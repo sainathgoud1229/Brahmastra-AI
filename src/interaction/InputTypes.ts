@@ -22,6 +22,14 @@ export interface InputHand {
   speed: number;
   handScale: number;
   extendedCount: number;
+  /** Per-finger extension 0..1. Thumb first. From GestureEngine. */
+  extension: number[];
+  /** 0..1 overall palm openness. */
+  palmOpenness: number;
+  /** Wrist rotation angle in radians. */
+  palmRoll: number;
+  /** Palm facing normal vector. */
+  palmNormal: { x: number; y: number; z: number };
   /** Present only for real tracked hands; used by the debug overlay. */
   landmarks: Landmark[] | null;
 }
@@ -42,6 +50,10 @@ export function createEmptyInputHand(slot: 0 | 1): InputHand {
     speed: 0,
     handScale: 0.16,
     extendedCount: 0,
+    extension: [0, 0, 0, 0, 0],
+    palmOpenness: 0,
+    palmRoll: 0,
+    palmNormal: { x: 0, y: 0, z: 1 },
     landmarks: null,
   };
 }

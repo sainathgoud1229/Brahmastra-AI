@@ -47,6 +47,12 @@ export class InputAdapter {
       hand.speed = features.speed;
       hand.handScale = features.handScale;
       hand.extendedCount = features.extendedCount;
+      hand.extension = features.extension as number[];
+      hand.palmOpenness = features.palmOpenness;
+      hand.palmRoll = features.palmRoll;
+      hand.palmNormal.x = features.palmNormal.x;
+      hand.palmNormal.y = features.palmNormal.y;
+      hand.palmNormal.z = features.palmNormal.z;
       hand.landmarks = features.landmarks.length > 0 ? features.landmarks : null;
     }
     return this.hands;

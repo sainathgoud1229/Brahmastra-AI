@@ -34,6 +34,13 @@ import { CAMERA_STATE_LABEL, type CameraState } from './vision/types';
 import { HUD } from './ui/HUD';
 import { BootSequence } from './ui/BootSequence';
 import { AudioEngine } from './audio/AudioEngine';
+import { ModeManager, MODE_META } from './modes/ModeManager';
+import { ModeSwitcher } from './modes/ModeSwitcher';
+import { RehabMode } from './modes/RehabMode';
+import { ControlPanelMode } from './modes/ControlPanelMode';
+import { SignLanguageMode } from './modes/SignLanguageMode';
+import { PresentationMode } from './modes/PresentationMode';
+import type { AppMode } from './modes/ModeManager';
 
 const WARM_MODE_SECONDS = 2.4;
 
@@ -65,6 +72,13 @@ class Application {
   private readonly hud: HUD;
   private readonly boot: BootSequence;
   private readonly audio = new AudioEngine();
+
+  private readonly modeManager = new ModeManager();
+  private readonly modeSwitcher: ModeSwitcher;
+  private readonly rehabMode = new RehabMode();
+  private readonly panelMode = new ControlPanelMode();
+  private readonly signMode = new SignLanguageMode();
+  private readonly slidesMode = new PresentationMode();
 
   private lastFrameTime = 0;
   private pixelRatio: number;
@@ -141,6 +155,23 @@ class Application {
 
     this.hud = new HUD(ui);
     this.boot = new BootSequence(ui, this.reducedMotion);
+
+    // Build real-life mode overlays
+    this.rehabMode.build(ui);
+    this.panelMode.build(ui);
+    this.signMode.build(ui);
+    this.slidesMode.build(ui);
+
+    // Mode switcher dock
+    this.modeSwitcher = new ModeSwitcher(ui);
+    this.modeSwitcher.onModeChange((mode) => this.switchMode(mode));
+    this.modeManager.onModeChange(({ to }) => {
+      this.modeSwitcher.setActive(to);
+      this.rehabMode.setVisible(to === 'REHAB');
+      this.panelMode.setVisible(to === 'PANEL');
+      this.signMode.setVisible(to === 'SIGN');
+      this.slidesMode.setVisible(to === 'SLIDES');
+    });
 
     this.applyAccessibility();
     this.registerControls(initialAudio);
@@ -319,6 +350,11 @@ class Application {
     });
 
     this.gestures.events.on('swipe', ({ direction }) => {
+      // Route swipe to presentation mode when active
+      if (this.modeManager.mode === 'SLIDES') {
+        this.slidesMode.onSwipe(direction);
+        return;
+      }
       // The view is mirrored, so an on-screen right swipe is a decreasing x.
       const applied = MAPPING.mirrorX ? -direction : direction;
       this.changeMode(this.orb.cycleMode(applied));
@@ -390,6 +426,12 @@ class Application {
     this.skeleton.setVisible(open);
     this.hud.status.setControlState('debug', open ? 'ON' : 'OFF', open);
     if (open && this.tracker.isEnabled) this.hud.debug.attachVideo(this.tracker.feed.video);
+  }
+
+  private switchMode(mode: AppMode): void {
+    this.modeManager.set(mode);
+    this.hud.gestures.toast(`${MODE_META[mode].icon} ${MODE_META[mode].label}`);
+    this.audio.play('mode');
   }
 
   private setReducedMotion(enabled: boolean): void {
@@ -510,7 +552,11 @@ class Application {
         this.hud.gestures.toast(visible ? 'CELESTIAL SYSTEM ONLINE' : 'CELESTIAL SYSTEM HIDDEN');
         break;
       }
+      case 'm':
+        this.switchMode(this.modeManager.cycle(1));
+        break;
       case 'escape':
+        if (this.modeManager.mode !== 'HOME') { this.switchMode('HOME'); break; }
         this.hud.status.hideNotice();
         break;
       default:
@@ -602,6 +648,14 @@ class Application {
     if (!this.contextLost) {
       this.post.render();
     }
+
+    /* --- mode overlays ------------------------------------------------- */
+    const currentMode = this.modeManager.mode;
+    const modeHands = this.adapter.current as import('./interaction/InputTypes').InputHand[];
+    if (currentMode === 'REHAB')  this.rehabMode.update(dt, modeHands);
+    if (currentMode === 'PANEL')  this.panelMode.update(dt, modeHands);
+    if (currentMode === 'SIGN')   this.signMode.update(dt, modeHands);
+    if (currentMode === 'SLIDES') this.slidesMode.update(dt, modeHands);
 
     this.updateHud(dt, systemGesture, usingCamera);
   };
@@ -744,6 +798,10 @@ class Application {
     for (const trail of this.trails) trail.dispose();
     this.audio.dispose();
     this.renderer.dispose();
+    this.rehabMode.dispose();
+    this.panelMode.dispose();
+    this.signMode.dispose();
+    this.slidesMode.dispose();
     this.ui.replaceChildren();
   }
 }
