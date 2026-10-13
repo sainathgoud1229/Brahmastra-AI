@@ -1,220 +1,147 @@
-# Brahmastra AI — Neural Intelligence Core
+# Brahmastra AI — Neural Intelligence Core & Celestial Simulation
 
-A browser-based holographic AI core, built from ~20,000 GPU-driven particles and a
-live synapse network, controlled entirely with your hands through a webcam.
+A browser-based, high-performance holographic AI core built from ~20,000 GPU-driven particles and a live synapse network, integrated with a continuous **9-Planet Celestial Orbital Simulation**, controlled via real-time hand gestures through your webcam, mouse, or keyboard.
 
-Three.js + WebGL + GLSL for the rendering; MediaPipe Hand Landmarker for the
-tracking. No backend, no frameworks, no camera data ever leaving the machine.
+Three.js + WebGL + GLSL for GPU rendering; MediaPipe Hand Landmarker for machine learning vision tracking. No backend, no frameworks, zero latency, and no camera data ever leaves your device.
 
 ---
 
-## Quick start
+## 🌟 Key Features
+
+* **🧠 20,000 Particle Neural Core**: GPU vertex shaders compute breathing noise, mode morphing, attraction, contraction, and energy wave shockwaves.
+* **🪐 9-Planet Celestial Orbital Simulation**: Realistic Keplerian orbits and continuous axial rotation for all 9 planets (**Mercury, Venus, Earth with Moon, Mars, Jupiter with Great Red Spot, Saturn with holographic rings, Uranus, Neptune, Pluto**).
+* **🔄 360° Omnidirectional Orbit Camera**: Drag your mouse or touch screen to smoothly inspect the entire system from **Top View, Bottom View, Left View, Right View**, or any custom angle.
+* **⚡ Electric Blue & Cyber Block Theme**: Aerospace telemetry visual language featuring glowing electric cyan accents, deep obsidian backdrops, sci-fi viewport brackets, and Orbitron typography.
+* **⏱️ Real-Time Clock & Palm Chrono Telemetry**: Live system timestamp (`YYYY-MM-DD HH:MM:SS.mmm`), real-time hand opening detection, open-duration stopwatch, and palm extension meters.
+* **🔒 100% Client-Side Privacy**: All camera vision inference runs inside a local Web Worker. Frames are read into an `ImageBitmap` and instantly discarded.
+
+---
+
+## Quick Start
 
 ```bash
 npm install
 npm run dev          # http://127.0.0.1:5173
 ```
 
-Open the URL and press **CAMERA** (bottom right). `localhost` counts as a secure
-origin, so the webcam prompt will appear normally.
+Open the URL in your browser and press **CAMERA** in the bottom-right HUD (or press <kbd>G</kbd> on your keyboard). `localhost` is treated as a secure origin, so the camera permission prompt will appear normally.
 
 ```bash
 npm run typecheck    # tsc --noEmit
-npm run build        # typecheck + production bundle into dist/
-npm run preview      # serve the production build
+npm run build        # typecheck + optimized production bundle into dist/
+npm run preview      # preview the production build locally
 ```
 
-If you serve `dist/` from anywhere other than localhost it must be over
-**https://** — browsers refuse `getUserMedia` on insecure origins. The app
-detects this and says so rather than failing silently.
+> [!NOTE]
+> If serving `dist/` over a local network or public server, it must be hosted over **HTTPS** — modern browsers refuse `getUserMedia` access on insecure HTTP origins.
 
-### First run
+### First-Time Model Cache
 
-Two assets are fetched once and then cached by the browser:
-
-| Asset                             | Source                                           |
-| --------------------------------- | ------------------------------------------------ |
-| MediaPipe WASM runtime            | `cdn.jsdelivr.net/npm/@mediapipe/tasks-vision` |
-| `hand_landmarker.task` (≈7 MB) | `storage.googleapis.com/mediapipe-models`      |
-
-To run fully offline, download both, drop them in `public/`, and repoint
-`VISION.wasmBasePath` / `VISION.modelAssetPath` in `src/config.ts`.
+Two static assets are downloaded once and cached by your browser:
+* MediaPipe Tasks Vision WASM runtime (`cdn.jsdelivr.net`)
+* `hand_landmarker.task` ML model (≈7 MB from Google Cloud CDN)
 
 ---
 
 ## Controls
 
-### Gestures
+### 🖐️ Hand Gestures (Webcam Mode)
 
-| Gesture                           | Action                                                                                   |
-| --------------------------------- | ---------------------------------------------------------------------------------------- |
-| **Open palm** (5 fingers)   | System active — network brightens, rings accelerate, energy pulse fires                 |
-| **Pinch** (thumb + index)   | Grab the orb; move to rotate it. Fires an energy filament to the core                    |
-| **Fist**                    | Power mode: the cloud contracts and turns gold. Release for a shockwave                  |
-| **Two hands**               | Move apart to expand, together to compress. Left hand steers, right hand modulates power |
-| **Point** (index only)      | Holographic reticle cursor. Pinch while pointing to select an orbital node               |
-| **Swipe** (fast horizontal) | Change orb configuration                                                                 |
-| 2 / 3 / 4 fingers                 | Navigation / system analysis / data visualisation modes                                  |
+| Gesture | Action |
+| :--- | :--- |
+| **Open Palm** (5 fingers) | Core active — network illuminates, rings accelerate, energy pulse fires |
+| **Pinch** (thumb + index) | Grab the orb to rotate; fires an energy filament to the core |
+| **Fist** | Power Mode — cloud contracts and turns gold. Release for shockwave |
+| **Two Hands** | Move apart to expand, together to compress. Left hand steers, right modulates power |
+| **Point** (index only) | Holographic reticle cursor. Pinch while pointing to inspect nodes |
+| **Swipe** (fast horizontal) | Cycle through orb configurations |
+| **2 / 3 / 4 fingers** | Navigation / System analysis / Data visualisation modes |
 
-### Mouse (no camera required)
+### 🖱️ Mouse & Touch (Full 360° Omnidirectional Controls)
 
-Move to steer · hold left button to pinch · drag to rotate · scroll to zoom.
-The pointer produces the same `InputHand` structure as a tracked hand, so every
-downstream system behaves identically.
+* **Drag Mouse (Left or Right Button) / Touch Drag**: Freely orbit camera 360° around all sides:
+  * **Drag Up**: Glides to **Top View** (look straight down onto all 9 concentric planetary orbits).
+  * **Drag Down**: Glides to **Bottom View** (look from underneath).
+  * **Drag Left / Right**: 360° horizontal orbit around the celestial system.
+* **Scroll Wheel / Pinch**: Zoom in close to individual planets or zoom out into deep space.
+* **Move Mouse**: Steer the holographic cursor reticle.
 
-### Keyboard
+### ⌨️ Keyboard Shortcuts
 
-| Key            | Action                                                    |
-| -------------- | --------------------------------------------------------- |
-| `1`–`5`   | Neural / Reactor / Data / Energy / Scanner configuration  |
-| `Space`      | Power pulse                                               |
-| `G`          | Toggle camera (gesture mode)                              |
-| `R`          | Reset orientation, scale and mode                         |
-| `D` or `C` | Debug overlay (camera preview, landmarks, indices, stats) |
-| `H`          | Hide/show the interface                                   |
-| `Esc`        | Dismiss a notice                                          |
-
----
-
-## How it works
-
-### Everything moves on the GPU
-
-The orb is one `THREE.Points` draw call and one `THREE.LineSegments` draw call.
-After start-up the CPU never touches a particle: all motion — breathing noise,
-mode morphing, hand attraction, contraction, burst, boot formation — is a single
-vertex-shader function in `src/shaders/common.glsl`.
-
-The connection lines run that *same* function, with each line vertex carrying the
-base positions of the node it belongs to. That is what keeps the synapses welded
-to their neurons through every deformation without any per-frame CPU work.
-
-### Five configurations, one buffer
-
-Each particle stores five base positions (neural, reactor, data, energy, scanner)
-as vertex attributes. Morphing is a weighted sum of those attributes with an
-animated weight vector, so transitions are continuous interpolations — geometry
-is never swapped out.
-
-### Synapse topology
-
-Connecting 20,000 nodes pairwise is 200 million tests. Instead a uniform spatial
-hash (`src/utils/SpatialHash.ts`) buckets the nodes by the connection radius and
-searches only the 27 neighbouring cells, capped at 3 links per node. Built once
-at start-up, during the boot animation.
-
-### Energy pulses
-
-Up to four expanding spherical wavefronts are held in a `vec4[4]` uniform
-(origin + start time). Every particle and every line computes its own distance to
-each wavefront, so an impulse visibly propagates outward through the network.
-Idle pulses fire from random nodes; gestures fire them from the interaction point.
-
-### Vision pipeline
-
-```
-webcam → ImageBitmap → Web Worker → MediaPipe HandLandmarker
-       → One Euro filter → GestureEngine → GestureStateMachine → HandInteraction
-```
-
-- Inference runs in a **module worker** so `detectForVideo` — which is synchronous
-  and, as Google's docs note, can block the UI thread — never stalls rendering.
-  If the worker cannot start, it transparently falls back to the main thread.
-- Inference is scheduled at ~30 Hz independently of the render loop, with
-  back-pressure so a slow frame can never queue up work.
-- Raw landmarks are filtered with a **One Euro filter** (low lag, low jitter),
-  then converted to size-normalised features — pinch distance is divided by the
-  hand's own wrist-to-knuckle scale, so thresholds hold at any distance from the
-  lens.
-- Every boolean has hysteresis, every state has a debounce. Nothing downstream
-  ever sees a raw landmark value.
-- The two hands are matched to stable slots frame to frame by handedness and
-  proximity, so filters never jump when MediaPipe reorders its output.
-
-### Performance
-
-- Adaptive quality with hysteresis: sustained sub-45 fps steps the tier down,
-  sustained 58+ fps for 10 s steps it back up, with a cooldown between changes so
-  quality cannot oscillate.
-- HIGH 20k particles / 8k connections · MEDIUM 10k / 4k · LOW 5k / 2k.
-- No allocation in the animation loop — vectors, colours and quaternions are
-  pre-allocated; particle pools are ring buffers.
-
-|                                      |                                                 |
-| ------------------------------------ | ----------------------------------------------- |
-| Draw calls for the whole orb         | 5 (particles, lines, motes, core layers, rings) |
-| Per-frame CPU work for 20k particles | uniform writes only                             |
-| Frame budget spent on hand tracking  | 0 — it runs in a worker                        |
+| Key | Action |
+| :--- | :--- |
+| `1`–`5` | Switch configuration (*Neural, Reactor, Data, Energy, Scanner*) |
+| `Space` | Fire energy pulse & celestial shockwave |
+| `T` | Snap to **Top View** (straight down onto all planetary orbits) |
+| `B` | Snap to **Bottom View** (looking from underneath) |
+| `L` / `K` | Snap to **Left View** / **Right View** |
+| `P` | Toggle **9-Planet Celestial System** on/off |
+| `R` | Reset camera view, orientation, scale, and mode |
+| `G` | Toggle webcam gesture mode on/off |
+| `D` or `C` | Toggle debug telemetry overlay (FPS, inference, landmarks) |
+| `H` | Hide / show interface HUD |
+| `Esc` | Dismiss active notice / modal dialog |
 
 ---
 
-## Project layout
+## System Architecture
+
+### 1. Planetary Celestial Mechanics (`src/effects/PlanetarySystem.ts`)
+* **9 Concentric Keplerian Orbits**: Scaled orbital velocities where inner terrestrial planets revolve faster and outer gas giants orbit majestically.
+* **Continuous Axial Rotation**: Planets spin continuously on their own tilted rotation axes (Earth at 23.5° / 0.41 rad, Uranus tipped on its side at ~98°).
+* **Procedural Surface Textures**: Generated at startup on dynamic HTML5 canvases (Earth's oceans and continents, Jupiter's storm bands and Great Red Spot, Mars' basalt and polar ice, Saturn's rings with Cassini division).
+* **Resonance Reaction**: When a power pulse fires, planetary orbit lines and atmospheric rims flare with cosmic energy.
+
+### 2. 360° Omnidirectional Camera Rig (`src/scene/CameraRig.ts`)
+* **Spherical Coordinate Navigation**: Uses `(phi, theta, distance)` to guarantee smooth, continuous camera rotation from top pole to bottom pole without gimbal lock.
+* **Cinematic Damping & Drift**: Subtle figure-eight camera breathing when idle, damping mouse input for smooth aerospace camera tracking.
+
+### 3. GPU Vertex-Shader Motion (`src/shaders/common.glsl`)
+* The core and synapse network execute within 5 total draw calls on the GPU.
+* The CPU never loops over individual particles per frame; all morphing, noise, and contraction run entirely inside GLSL shaders.
+
+### 4. Vision Web Worker Pipeline (`src/vision/`)
+```
+Webcam Frame → ImageBitmap → Web Worker → MediaPipe HandLandmarker
+             → One Euro Filter → GestureEngine → HandInteraction
+```
+* Runs in a dedicated Web Worker at ~30 Hz so computer vision inference never stalls the 60+ FPS Three.js render loop.
+
+---
+
+## Project Layout
 
 ```
 src/
-  main.ts                  application wiring and the frame loop
-  config.ts                every tunable value in the project
-  scene/                   renderer, camera rig, background, post-processing
-  orb/                     particle system, synapse network, core, rings, modes
-  vision/                  camera, MediaPipe worker, smoothing, gesture engine
-  interaction/             hand→world mapping, state machine, mouse fallback
-  effects/                 beams, trails, burst, reticle, scan arc, orbital nodes
-  ui/                      HUD panels, boot sequence, debug overlay
-  audio/                   procedural Web Audio cues
-  shaders/                 GLSL (.vert/.frag/.glsl), loaded with Vite's ?raw
-  utils/                   maths, noise, spatial hash, performance, capabilities
+  main.ts                  Application wiring, loop, and mouse orbit controls
+  config.ts                Tunable parameters, colors, and camera distances
+  scene/
+    CameraRig.ts           360° omnidirectional orbital camera rig
+    SceneManager.ts        Scene graph, ambient & rim lights, starfield
+    Background.ts          Procedural background starfield and haze
+    PostProcessing.ts      Bloom and post-processing pipeline
+  orb/
+    NeuralOrb.ts           Core particle cloud and synapse network
+    EnergyCore.ts          Inner glowing nuclear core
+    OrbitalRings.ts        Concentric aerospace rings
+    OrbModes.ts            5 morphing particle geometries
+  effects/
+    PlanetarySystem.ts     9-Planet celestial orbital simulation & textures
+    OrbitalNodes.ts        Interactive holographic node telemetry
+    ParticleBurst.ts       Shockwave particle explosions
+    HolographicBeam.ts     Energy filaments connecting hands to core
+    Reticle.ts             Futuristic HUD cursor reticle
+  vision/
+    HandTracker.ts         Camera stream and Web Worker coordinator
+    GestureEngine.ts       21-landmark geometric gesture classification
+    OneEuroFilter.ts       Low-jitter, low-latency landmark filtering
+  ui/
+    HUD.ts                 Left/right telemetry panels & Palm Chrono block
+    SystemStatus.ts        Top identity block & real-time clock
+    styles.css             Electric Blue & Cyber Block styling
 ```
 
 ---
-
-## Privacy
-
-Camera frames are read into an `ImageBitmap`, passed to a worker in the same
-browser tab, and discarded. There is no network code in the application beyond
-the two static asset fetches listed above. The HUD states this permanently:
-**CAMERA PROCESSING: LOCAL**.
-
----
-
-## Honest notes
-
-- **GPU (EST)** in the right-hand panel is derived from frame time, not from a
-  hardware counter — browsers do not expose real GPU load. It is labelled as an
-  estimate in the UI and the panel says so in full underneath. FPS, latency,
-  particle and connection counts are all measured values.
-- Rendering is verified headlessly in this repo via `dev/` (see below), which
-  runs on a software rasteriser at a few fps. That number says nothing about real
-  hardware; the quality tiers are sized for a normal discrete or integrated GPU.
-
-## Verification harness (`dev/`)
-
-`dev/` contains an offline test rig, kept out of the application bundle:
-
-- `dev/server.mjs` — static server that emulates the two Vite features used here
-  (`?raw` imports, extensionless specifiers)
-- `dev/mediapipe-stub.js` — synthesises anatomically plausible 21-landmark hands
-  so the whole pipeline can be driven without a webcam
-- `dev/run.mjs` — drives Chromium through boot, every gesture, all five modes,
-  resize and teardown, then reports console errors and shader failures
-
-```bash
-npx tsc -p tsconfig.test.json && node dev/run.mjs
-```
-
-You can delete the `dev/` folder entirely; nothing in `src/` imports it.
-
----
-
-## Credits and licences
-
-- Simplex noise: Ashima Arts / Stefan Gustavson (MIT), inlined in
-  `src/shaders/noise.glsl`
-- One Euro filter: Casiez, Roussel & Vogel, CHI 2012
-- Hand tracking: Google MediaPipe Tasks Vision (Apache 2.0)
-- Rendering: three.js (MIT)
-
-All geometry, shaders, HUD design and the Brahmastra AI identity are original to
-this project. No third-party UI assets, logos or trademarks are used.
 
 ## Author
 

@@ -22,6 +22,7 @@ import { ParticleBurst } from './effects/ParticleBurst';
 import { Reticle } from './effects/Reticle';
 import { ScanArc } from './effects/ScanArc';
 import { OrbitalNodes } from './effects/OrbitalNodes';
+import { PlanetarySystem } from './effects/PlanetarySystem';
 import { HandSkeleton } from './effects/HandSkeleton';
 import { HandInteraction } from './interaction/HandInteraction';
 import { GestureStateMachine, SYSTEM_GESTURE_LABEL } from './interaction/GestureStateMachine';
@@ -52,6 +53,7 @@ class Application {
   private readonly reticle = new Reticle();
   private readonly scanArc = new ScanArc();
   private readonly nodes = new OrbitalNodes();
+  private readonly planets = new PlanetarySystem();
   private readonly skeleton = new HandSkeleton();
 
   private readonly tracker = new HandTracker();
@@ -76,6 +78,9 @@ class Application {
   private reducedMotion: boolean;
   private highContrast: boolean;
   private lastCameraState: CameraState = 'OFF';
+  private handOpenActive = false;
+  private lastHandOpenedAt = '—';
+  private handOpenDuration = 0;
 
   constructor(canvas: HTMLCanvasElement, ui: HTMLElement) {
     this.canvas = canvas;
@@ -107,6 +112,7 @@ class Application {
     this.scene.add(this.reticle.group);
     this.scene.add(this.scanArc.mesh);
     this.scene.add(this.nodes.group);
+    this.scene.add(this.planets.group);
     this.scene.add(this.skeleton.group);
 
     this.post = new PostProcessing(
@@ -209,6 +215,22 @@ class Application {
       },
       () => this.setHighContrast(!this.highContrast),
     );
+    this.hud.status.addControl(
+      { id: 'planets', label: '9 PLANETS', initialState: 'ON', on: true },
+      () => {
+        const visible = this.planets.toggleVisible();
+        this.hud.status.setControlState('planets', visible ? 'ON' : 'OFF', visible);
+        this.hud.gestures.toast(visible ? 'CELESTIAL SYSTEM ONLINE' : 'CELESTIAL SYSTEM HIDDEN');
+      },
+    );
+    this.hud.status.addControl({ id: 'topview', label: 'TOP VIEW', initialState: 'VIEW' }, () => {
+      this.scene.rig.setTopView();
+      this.hud.gestures.toast('CAMERA: TOP VIEW');
+    });
+    this.hud.status.addControl({ id: 'resetview', label: 'RESET VIEW', initialState: 'VIEW' }, () => {
+      this.scene.rig.resetView();
+      this.hud.gestures.toast('CAMERA: DEFAULT VIEW');
+    });
   }
 
   private registerEvents(): void {
@@ -444,15 +466,32 @@ class Application {
         this.orb.firePulse();
         this.orb.triggerBurst();
         this.burst.fire(this.orb.group.position, ORB.radius * 0.4 * this.orb.currentScale, 260, 4.0, 0);
+        this.planets.triggerPulse();
         this.audio.play('power');
         this.hud.gestures.toast('POWER PULSE');
         break;
       case 'r':
         this.orb.resetOrientation();
         this.interaction.reset();
-        this.scene.rig.setDistance(6.2);
+        this.scene.rig.resetView();
         this.hud.gestures.setMode(ORB_MODE_LABEL.NEURAL, 0, ORB_MODES.length);
         this.hud.gestures.toast('SYSTEM RESET');
+        break;
+      case 't':
+        this.scene.rig.setTopView();
+        this.hud.gestures.toast('CAMERA: TOP VIEW');
+        break;
+      case 'b':
+        this.scene.rig.setBottomView();
+        this.hud.gestures.toast('CAMERA: BOTTOM VIEW');
+        break;
+      case 'l':
+        this.scene.rig.setLeftView();
+        this.hud.gestures.toast('CAMERA: LEFT VIEW');
+        break;
+      case 'k':
+        this.scene.rig.setRightView();
+        this.hud.gestures.toast('CAMERA: RIGHT VIEW');
         break;
       case 'd':
         this.toggleDebug();
@@ -465,6 +504,12 @@ class Application {
       case 'c':
         this.toggleDebug();
         break;
+      case 'p': {
+        const visible = this.planets.toggleVisible();
+        this.hud.status.setControlState('planets', visible ? 'ON' : 'OFF', visible);
+        this.hud.gestures.toast(visible ? 'CELESTIAL SYSTEM ONLINE' : 'CELESTIAL SYSTEM HIDDEN');
+        break;
+      }
       case 'escape':
         this.hud.status.hideNotice();
         break;
@@ -522,12 +567,18 @@ class Application {
       ? this.adapter.fromTracked(this.tracker.hands)
       : this.adapter.fromPointer(this.mouse.update(dt));
 
-    if (!usingCamera) {
-      const zoom = this.mouse.consumeZoom();
-      if (zoom !== 0) {
-        this.orb.nudgeScale(zoom * 1.2);
-        this.scene.rig.nudgeDistance(-zoom * 2.2);
-      }
+    // Mouse / Touch drag to orbit camera freely around all sides
+    const drag = this.mouse.consumeDrag();
+    if (drag.x !== 0 || drag.y !== 0) {
+      // Horizontal drag orbits around Y axis (left-right view)
+      // Vertical drag tilts/pitches elevation (top-bottom view)
+      this.scene.rig.orbit(-drag.x * 0.0055, -drag.y * 0.0055);
+    }
+
+    const zoom = this.mouse.consumeZoom();
+    if (zoom !== 0) {
+      this.orb.nudgeScale(zoom * 1.2);
+      this.scene.rig.nudgeDistance(-zoom * 3.5);
     }
 
     const systemGesture = this.gestures.update(hands, dt);
@@ -543,6 +594,7 @@ class Application {
 
     this.orb.update(dt, this.elapsed, camera);
     this.burst.update(dt, this.elapsed, camera.quaternion);
+    this.planets.update(dt, this.orb.activation);
     this.scene.update(dt, this.elapsed, this.orb.activation, this.orb.warmth);
     this.post.update(dt, this.elapsed, this.orb.activation);
 
@@ -579,6 +631,36 @@ class Application {
         : 'STANDBY';
 
     const activation = this.orb.activation;
+
+    // Check real-time palm open status
+    const isHandOpen =
+      (hands[0]?.active && (hands[0].gesture === 'OPEN_PALM' || hands[0].extendedCount >= 4)) ||
+      (hands[1]?.active && (hands[1].gesture === 'OPEN_PALM' || hands[1].extendedCount >= 4));
+
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+    const ms = String(now.getMilliseconds()).padStart(3, '0');
+    const timeOnly = `${hh}:${mm}:${ss}.${ms}`;
+    const dateStr = now.toISOString().slice(0, 10);
+    const realtimeClock = `${dateStr}  ${timeOnly}`;
+
+    if (isHandOpen) {
+      if (!this.handOpenActive) {
+        this.handOpenActive = true;
+        this.lastHandOpenedAt = timeOnly;
+        this.handOpenDuration = 0;
+      }
+      this.handOpenDuration += dt;
+    } else {
+      this.handOpenActive = false;
+    }
+
+    const openness0 = hands[0]?.active ? hands[0].extendedCount / 5 : 0;
+    const openness1 = hands[1]?.active ? hands[1].extendedCount / 5 : 0;
+    const handOpenness = Math.max(openness0, openness1);
+
     this.hud.update(dt, {
       cameraLabel,
       cameraLevel: level,
@@ -606,6 +688,11 @@ class Application {
       quality: this.tier,
       processing: usingCamera ? `VISION / ${this.tracker.visionMode.toUpperCase()}` : 'POINTER',
       energyLabel: activation > 0.85 ? 'SURGE' : activation > 0.5 ? 'ELEVATED' : 'NOMINAL',
+      realtimeClock,
+      isHandOpen,
+      handOpenedAt: this.lastHandOpenedAt,
+      handOpenDuration: this.handOpenDuration,
+      handOpenness,
     });
 
     if (this.hud.debug.isOpen) {
@@ -651,6 +738,7 @@ class Application {
     this.reticle.dispose();
     this.scanArc.dispose();
     this.nodes.dispose();
+    this.planets.dispose();
     this.skeleton.dispose();
     for (const beam of this.beams) beam.dispose();
     for (const trail of this.trails) trail.dispose();

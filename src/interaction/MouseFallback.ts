@@ -14,6 +14,8 @@ export class MouseFallback {
   private readonly velocityY = new Ema(9);
   private previous: { x: number; y: number } | null = null;
   private zoomDelta = 0;
+  private dragDeltaX = 0;
+  private dragDeltaY = 0;
   private enabled = false;
   private pointerInside = false;
   private detach: Array<() => void> = [];
@@ -21,31 +23,62 @@ export class MouseFallback {
   constructor(private readonly element: HTMLElement) {}
 
   attach(): void {
+    let isDragging = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    let isTouchDragging = false;
+    let lastTouchX = 0;
+    let lastTouchY = 0;
+
     const onPointerMove = (event: PointerEvent): void => {
       this.pointerInside = true;
       const rect = this.element.getBoundingClientRect();
       this.hand.palm.x = (event.clientX - rect.left) / Math.max(1, rect.width);
       this.hand.palm.y = (event.clientY - rect.top) / Math.max(1, rect.height);
       this.hand.palm.z = 0;
+
+      if (isDragging) {
+        const dx = event.clientX - lastX;
+        const dy = event.clientY - lastY;
+        this.dragDeltaX += dx;
+        this.dragDeltaY += dy;
+        lastX = event.clientX;
+        lastY = event.clientY;
+      }
     };
 
     const onPointerDown = (event: PointerEvent): void => {
-      if (event.button !== 0) return;
-      this.hand.pinching = true;
+      isDragging = true;
+      lastX = event.clientX;
+      lastY = event.clientY;
+      if (event.button === 0) {
+        this.hand.pinching = true;
+      }
     };
 
     const onPointerUp = (): void => {
+      isDragging = false;
       this.hand.pinching = false;
     };
 
     const onPointerLeave = (): void => {
       this.pointerInside = false;
       this.hand.pinching = false;
+      isDragging = false;
     };
 
     const onWheel = (event: WheelEvent): void => {
       event.preventDefault();
       this.zoomDelta += -event.deltaY * 0.0012;
+    };
+
+    const onTouchStart = (event: TouchEvent): void => {
+      const touch = event.touches[0];
+      if (!touch) return;
+      isTouchDragging = true;
+      lastTouchX = touch.clientX;
+      lastTouchY = touch.clientY;
     };
 
     const onTouchMove = (event: TouchEvent): void => {
@@ -56,10 +89,18 @@ export class MouseFallback {
       this.hand.pinching = event.touches.length >= 1;
       this.hand.palm.x = (touch.clientX - rect.left) / Math.max(1, rect.width);
       this.hand.palm.y = (touch.clientY - rect.top) / Math.max(1, rect.height);
+
+      if (isTouchDragging) {
+        this.dragDeltaX += touch.clientX - lastTouchX;
+        this.dragDeltaY += touch.clientY - lastTouchY;
+        lastTouchX = touch.clientX;
+        lastTouchY = touch.clientY;
+      }
     };
 
     const onTouchEnd = (): void => {
       this.hand.pinching = false;
+      isTouchDragging = false;
     };
 
     this.element.addEventListener('pointermove', onPointerMove);
@@ -67,6 +108,7 @@ export class MouseFallback {
     window.addEventListener('pointerup', onPointerUp);
     this.element.addEventListener('pointerleave', onPointerLeave);
     this.element.addEventListener('wheel', onWheel, { passive: false });
+    this.element.addEventListener('touchstart', onTouchStart, { passive: true });
     this.element.addEventListener('touchmove', onTouchMove, { passive: true });
     this.element.addEventListener('touchend', onTouchEnd);
 
@@ -76,6 +118,7 @@ export class MouseFallback {
       () => window.removeEventListener('pointerup', onPointerUp),
       () => this.element.removeEventListener('pointerleave', onPointerLeave),
       () => this.element.removeEventListener('wheel', onWheel),
+      () => this.element.removeEventListener('touchstart', onTouchStart),
       () => this.element.removeEventListener('touchmove', onTouchMove),
       () => this.element.removeEventListener('touchend', onTouchEnd),
     ];
@@ -99,6 +142,15 @@ export class MouseFallback {
     const delta = this.zoomDelta;
     this.zoomDelta = 0;
     return delta;
+  }
+
+  /** Drag delta accumulated since the last call for orbit controls. */
+  consumeDrag(): { x: number; y: number } {
+    const dx = this.dragDeltaX;
+    const dy = this.dragDeltaY;
+    this.dragDeltaX = 0;
+    this.dragDeltaY = 0;
+    return { x: dx, y: dy };
   }
 
   update(dt: number): InputHand {

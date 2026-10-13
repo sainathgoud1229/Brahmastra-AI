@@ -13,13 +13,20 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./src/ui/styles.css" />
   </head>
   <body>
     <div id="app">
+      <!-- Cyber Block Viewfinder Corners -->
+      <div class="block-corner corner-tl" aria-hidden="true"></div>
+      <div class="block-corner corner-tr" aria-hidden="true"></div>
+      <div class="block-corner corner-bl" aria-hidden="true"></div>
+      <div class="block-corner corner-br" aria-hidden="true"></div>
+      <!-- Subtle Atmosphere Scanlines -->
+      <div class="cyber-scanlines" aria-hidden="true"></div>
       <canvas id="scene"></canvas>
       <div id="ui" aria-live="polite"></div>
     </div>

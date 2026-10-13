@@ -1,21 +1,25 @@
 /* ==========================================================================
-   N.E.X.U.S. holographic interface
-   Visual language: aerospace instrumentation. Thin rules, technical type,
-   almost no fill. Nothing here should read as a web dashboard.
+   BRAHMASTRA AI holographic neural interface
+   Visual language: Electric Blue & Cyber Block Aerospace Telemetry.
+   Precision monospace, neon cyber-glow, and high-contrast obsidian backdrops.
    ========================================================================== */
 
 :root {
-  --cyan: #2ff3ff;
-  --cyan-dim: rgba(47, 243, 255, 0.42);
-  --cyan-faint: rgba(47, 243, 255, 0.14);
-  --ice: #a9e9ff;
-  --white: #eaffff;
+  --cyan: #00e5ff;
+  --cyan-bright: #3bf6ff;
+  --cyan-dim: rgba(0, 229, 255, 0.45);
+  --cyan-faint: rgba(0, 229, 255, 0.16);
+  --blue-neon: #0077ff;
+  --blue-deep: #020b18;
+  --ice: #b5eaff;
+  --white: #f0faff;
   --amber: #ffb340;
-  --red: #ff5a5a;
-  --bg: #000205;
-  --panel-border: rgba(47, 243, 255, 0.22);
-  --font-display: 'Rajdhani', 'Eurostile', 'Bahnschrift', 'DIN Alternate', sans-serif;
-  --font-mono: 'Share Tech Mono', ui-monospace, 'SF Mono', 'Roboto Mono', monospace;
+  --red: #ff4d4d;
+  --bg: #000308;
+  --panel-border: rgba(0, 195, 255, 0.38);
+  --font-orbitron: 'Orbitron', 'Rajdhani', sans-serif;
+  --font-display: 'Rajdhani', 'Eurostile', sans-serif;
+  --font-mono: 'Share Tech Mono', ui-monospace, 'SF Mono', monospace;
   --hud-opacity: 1;
 }
 
@@ -28,7 +32,7 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: var(--bg);
+  background: radial-gradient(circle at 50% 50%, #031126 0%, #010612 55%, #000206 100%);
   color: var(--ice);
   font-family: var(--font-display);
   overflow: hidden;
@@ -38,6 +42,33 @@ body {
 #app {
   position: fixed;
   inset: 0;
+}
+
+/* Cyber Block Viewport Corner Brackets */
+.block-corner {
+  position: fixed;
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+  z-index: 10;
+  border: 2px solid var(--cyan);
+  opacity: 0.85;
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.5);
+}
+.corner-tl { top: 14px; left: 14px; border-right: none; border-bottom: none; }
+.corner-tr { top: 14px; right: 14px; border-left: none; border-bottom: none; }
+.corner-bl { bottom: 14px; left: 14px; border-right: none; border-top: none; }
+.corner-br { bottom: 14px; right: 14px; border-left: none; border-top: none; }
+
+/* Atmosphere Scanlines */
+.cyber-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(rgba(0, 15, 30, 0) 50%, rgba(0, 229, 255, 0.025) 50%);
+  background-size: 100% 4px;
+  z-index: 1;
+  opacity: 0.6;
 }
 
 #scene {
@@ -55,6 +86,7 @@ body {
   pointer-events: none;
   opacity: var(--hud-opacity);
   transition: opacity 420ms ease;
+  z-index: 2;
 }
 
 #ui.hidden {
@@ -65,23 +97,25 @@ body {
 
 .panel {
   position: absolute;
-  padding: 14px 16px 15px;
+  padding: 16px 18px;
   border: 1px solid var(--panel-border);
-  background: linear-gradient(180deg, rgba(2, 12, 18, 0.55), rgba(0, 4, 8, 0.28));
-  backdrop-filter: blur(1.5px);
-  min-width: 214px;
+  border-top: 3px solid var(--cyan);
+  background: rgba(2, 8, 20, 0.88);
+  backdrop-filter: blur(6px);
+  min-width: 232px;
+  box-shadow: 0 8px 32px rgba(0, 2, 8, 0.9), 0 0 20px rgba(0, 114, 255, 0.12) inset;
   animation: panel-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Corner ticks instead of rounded cards. */
+/* Corner ticks for block panels */
 .panel::before,
 .panel::after {
   content: '';
   position: absolute;
-  width: 11px;
-  height: 11px;
+  width: 12px;
+  height: 12px;
   border: 1px solid var(--cyan);
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .panel::before {
@@ -100,20 +134,28 @@ body {
 
 .panel-title {
   font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.34em;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
   color: var(--cyan);
-  opacity: 0.9;
-  margin-bottom: 10px;
+  background: linear-gradient(90deg, rgba(0, 114, 255, 0.3) 0%, rgba(0, 229, 255, 0.05) 100%);
+  border-left: 3px solid var(--cyan);
+  padding: 4px 8px;
+  margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0 0 10px rgba(0, 114, 255, 0.2);
 }
 
 .panel-title span.tag {
-  font-size: 8px;
+  font-size: 8.5px;
   letter-spacing: 0.2em;
-  opacity: 0.55;
+  color: var(--white);
+  background: rgba(0, 114, 255, 0.35);
+  border: 1px solid rgba(0, 229, 255, 0.4);
+  padding: 1px 6px;
+  border-radius: 1px;
 }
 
 .row {
@@ -124,25 +166,26 @@ body {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.12em;
-  padding: 2px 0;
-  color: rgba(169, 233, 255, 0.78);
+  padding: 3px 0;
+  color: rgba(181, 234, 255, 0.82);
 }
 
 .row .value {
   color: var(--white);
-  text-shadow: 0 0 8px rgba(47, 243, 255, 0.55);
+  font-weight: 500;
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.65);
 }
 
 .row.sub {
   font-size: 10px;
-  opacity: 0.72;
+  opacity: 0.75;
   padding-left: 10px;
-  border-left: 1px solid var(--cyan-faint);
+  border-left: 2px solid var(--cyan-faint);
 }
 
 .row.warn .value {
   color: var(--amber);
-  text-shadow: 0 0 8px rgba(255, 179, 64, 0.5);
+  text-shadow: 0 0 8px rgba(255, 179, 64, 0.65);
 }
 
 .row.bad .value {
@@ -151,15 +194,16 @@ body {
 
 .divider {
   height: 1px;
-  background: linear-gradient(90deg, var(--cyan-dim), transparent);
-  margin: 9px 0;
+  background: linear-gradient(90deg, var(--cyan-dim), rgba(0, 114, 255, 0.1), transparent);
+  margin: 10px 0;
 }
 
 .meter {
   position: relative;
-  height: 3px;
-  background: rgba(47, 243, 255, 0.1);
-  margin: 3px 0 7px;
+  height: 5px;
+  background: rgba(0, 25, 55, 0.7);
+  border: 1px solid rgba(0, 229, 255, 0.25);
+  margin: 4px 0 8px;
   overflow: hidden;
 }
 
@@ -167,21 +211,21 @@ body {
   position: absolute;
   inset: 0 auto 0 0;
   width: 0%;
-  background: linear-gradient(90deg, rgba(47, 243, 255, 0.35), var(--cyan));
-  box-shadow: 0 0 10px rgba(47, 243, 255, 0.65);
-  transition: width 180ms linear;
+  background: linear-gradient(90deg, var(--blue-neon), var(--cyan));
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.8);
+  transition: width 150ms linear;
 }
 
 .meter.warm i {
-  background: linear-gradient(90deg, rgba(255, 179, 64, 0.35), var(--amber));
-  box-shadow: 0 0 10px rgba(255, 179, 64, 0.6);
+  background: linear-gradient(90deg, rgba(255, 179, 64, 0.4), var(--amber));
+  box-shadow: 0 0 10px rgba(255, 179, 64, 0.8);
 }
 
 /* --------------------------------------------------------------- top block */
 
 .hud-top {
   position: absolute;
-  top: 26px;
+  top: 24px;
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
@@ -189,43 +233,62 @@ body {
 }
 
 .hud-top .brand {
-  font-size: 30px;
-  font-weight: 600;
-  letter-spacing: 0.52em;
-  text-indent: 0.52em;
+  font-family: var(--font-orbitron);
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 0.48em;
+  text-indent: 0.48em;
   color: var(--white);
-  text-shadow: 0 0 22px rgba(47, 243, 255, 0.55), 0 0 60px rgba(47, 243, 255, 0.22);
+  text-shadow: 0 0 20px rgba(0, 229, 255, 0.85), 0 0 50px rgba(0, 114, 255, 0.5);
   line-height: 1;
 }
 
 .hud-top .subtitle {
-  margin-top: 7px;
+  margin-top: 8px;
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 10px;
   letter-spacing: 0.42em;
   text-indent: 0.42em;
   color: var(--cyan);
-  opacity: 0.72;
+  opacity: 0.85;
+  font-weight: 600;
 }
 
 .hud-top .status {
-  margin-top: 9px;
+  margin-top: 10px;
   font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.28em;
-  display: flex;
-  gap: 8px;
+  font-size: 10.5px;
+  letter-spacing: 0.24em;
+  display: inline-flex;
+  gap: 10px;
   align-items: center;
   justify-content: center;
-  color: rgba(169, 233, 255, 0.8);
+  color: var(--ice);
+  background: rgba(0, 16, 38, 0.85);
+  border: 1px solid rgba(0, 229, 255, 0.35);
+  border-radius: 2px;
+  padding: 4px 16px;
+  box-shadow: 0 0 15px rgba(0, 114, 255, 0.2) inset;
+}
+
+.hud-clock {
+  color: var(--cyan);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.6);
+}
+
+.chrono-sep {
+  color: rgba(0, 229, 255, 0.5);
+  font-size: 8px;
 }
 
 .dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--cyan);
-  box-shadow: 0 0 10px var(--cyan);
+  box-shadow: 0 0 12px var(--cyan);
   animation: pulse 2.1s ease-in-out infinite;
 }
 
@@ -386,40 +449,48 @@ body {
 
 button.ctl {
   font-family: var(--font-mono);
-  font-size: 9.5px;
+  font-size: 10px;
   letter-spacing: 0.24em;
-  color: rgba(169, 233, 255, 0.85);
-  background: rgba(2, 14, 20, 0.55);
+  color: var(--ice);
+  background: rgba(2, 10, 24, 0.85);
   border: 1px solid var(--panel-border);
-  padding: 7px 13px;
+  border-left: 3px solid rgba(0, 195, 255, 0.45);
+  padding: 8px 14px;
   cursor: pointer;
   transition: all 180ms ease;
-  min-width: 148px;
+  min-width: 154px;
   text-align: left;
   display: flex;
   justify-content: space-between;
   gap: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
 }
 
 button.ctl:hover,
 button.ctl:focus-visible {
   border-color: var(--cyan);
+  border-left: 3px solid var(--cyan);
   color: var(--white);
-  box-shadow: 0 0 18px rgba(47, 243, 255, 0.18) inset;
+  background: rgba(0, 24, 52, 0.9);
+  box-shadow: 0 0 18px rgba(0, 229, 255, 0.28);
   outline: none;
 }
 
 button.ctl[data-on='true'] {
   border-color: var(--cyan);
+  border-left: 3px solid var(--cyan);
   color: var(--white);
+  background: rgba(0, 20, 48, 0.75);
 }
 
 button.ctl[data-on='true'] .state {
   color: var(--cyan);
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.6);
 }
 
 button.ctl .state {
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
 .privacy {

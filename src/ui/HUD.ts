@@ -29,6 +29,11 @@ export interface HudFrame {
   quality: string;
   processing: string;
   energyLabel: string;
+  realtimeClock: string;
+  isHandOpen: boolean;
+  handOpenedAt: string;
+  handOpenDuration: number;
+  handOpenness: number;
 }
 
 /**
@@ -49,6 +54,11 @@ export class HUD {
   private readonly trackingRows: Array<{ state: RowHandle; confidence: RowHandle }> = [];
   private readonly gestureRow: RowHandle;
   private readonly handCountRow: RowHandle;
+
+  private readonly palmStateRow: RowHandle;
+  private readonly openedAtRow: RowHandle;
+  private readonly openDurationRow: RowHandle;
+  private readonly openMeter: MeterHandle;
 
   private readonly powerRow: RowHandle;
   private readonly powerMeter: MeterHandle;
@@ -94,6 +104,19 @@ export class HUD {
     this.gestureRow = row('GESTURE', 'STANDBY');
     this.handCountRow = row('HANDS', '0');
     this.leftPanel.append(this.gestureRow.root, this.handCountRow.root);
+
+    this.leftPanel.append(divider());
+    this.leftPanel.append(panelTitle('PALM CHRONO', 'REAL-TIME'));
+    this.palmStateRow = row('PALM STATE', 'STANDBY');
+    this.openedAtRow = row('OPENED AT', '—');
+    this.openDurationRow = row('OPEN TIME', '0.00s');
+    this.openMeter = meter();
+    this.leftPanel.append(
+      this.palmStateRow.root,
+      this.openedAtRow.root,
+      this.openDurationRow.root,
+      this.openMeter.root,
+    );
     this.root.append(this.leftPanel);
 
     /* ---------------------------------------------------------- right */
@@ -162,6 +185,7 @@ export class HUD {
     this.smoothLatency = damp(this.smoothLatency, frame.latencyMs, lambda, dt);
 
     this.status.setStatus(frame.cameraLabel, frame.cameraLevel);
+    this.status.setTime(frame.realtimeClock);
 
     for (let i = 0; i < 2; i++) {
       const hand = frame.hands[i];
@@ -173,6 +197,18 @@ export class HUD {
 
     this.gestureRow.setValue(frame.gestureLabel);
     this.handCountRow.setValue(String(frame.handCount));
+
+    this.palmStateRow.setValue(frame.isHandOpen ? 'OPEN PALM [ACTIVE]' : 'STANDBY / IDLE');
+    this.palmStateRow.setLevel(frame.isHandOpen ? 'normal' : 'warn');
+    this.openedAtRow.setValue(frame.handOpenedAt);
+    this.openDurationRow.setValue(
+      frame.isHandOpen
+        ? `${frame.handOpenDuration.toFixed(2)}s (ACTIVE)`
+        : frame.handOpenDuration > 0
+          ? `${frame.handOpenDuration.toFixed(2)}s (HOLD)`
+          : '0.00s',
+    );
+    this.openMeter.set(frame.handOpenness);
 
     this.powerRow.setValue(formatPercent(this.smoothPower));
     this.powerMeter.set(this.smoothPower);

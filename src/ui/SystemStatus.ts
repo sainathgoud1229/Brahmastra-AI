@@ -25,6 +25,7 @@ export class SystemStatus {
   readonly root: HTMLDivElement;
 
   private readonly statusText: HTMLSpanElement;
+  private readonly timeText: HTMLSpanElement;
   private readonly dot: HTMLSpanElement;
   private readonly controls: HTMLDivElement;
   private readonly buttons = new Map<string, { button: HTMLButtonElement; state: HTMLSpanElement }>();
@@ -40,7 +41,8 @@ export class SystemStatus {
     const status = el('div', 'status');
     this.dot = el('span', 'dot');
     this.statusText = el('span', undefined, 'ONLINE');
-    status.append(this.dot, this.statusText);
+    this.timeText = el('span', 'hud-clock', 'UTC 00:00:00.000');
+    status.append(this.dot, this.statusText, el('span', 'chrono-sep', '■'), this.timeText);
 
     this.root.append(brand, subtitle, status);
     parent.append(this.root);
@@ -53,6 +55,10 @@ export class SystemStatus {
     this.statusText.textContent = text;
     this.dot.classList.toggle('warn', level === 'warn');
     this.dot.classList.toggle('bad', level === 'bad');
+  }
+
+  setTime(timeString: string): void {
+    this.timeText.textContent = timeString;
   }
 
   addControl(definition: ControlDefinition, onClick: () => void): void {
