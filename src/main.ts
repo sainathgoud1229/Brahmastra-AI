@@ -162,6 +162,50 @@ class Application {
     this.signMode.build(ui);
     this.slidesMode.build(ui);
 
+    // Bridge real controls into ControlPanelMode
+    this.panelMode.setBridge({
+      setMasterVolume: (vol) => {
+        this.audio.setVolume(vol);
+      },
+      setDisplayBrightness: (brightness) => {
+        canvas.style.filter = `brightness(${brightness}) contrast(${this.highContrast ? 1.3 : 1.0})`;
+      },
+      setOrbitSpeed: (speed) => {
+        this.planets.setTimeScale(speed);
+      },
+      setCameraDistance: (dist) => {
+        this.scene.rig.setDistance(6.0 + dist * 14.0);
+      },
+      toggleFullscreen: () => {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+        else document.exitFullscreen().catch(() => {});
+      },
+      toggleSound: () => {
+        void this.toggleAudio();
+      },
+      togglePlanets: () => {
+        const visible = this.planets.toggleVisible();
+        this.hud.status.setControlState('planets', visible ? 'ON' : 'OFF', visible);
+        return visible;
+      },
+      setTopView: () => {
+        this.scene.rig.setTopView();
+        this.hud.gestures.toast('CAMERA: TOP VIEW');
+      },
+      resetView: () => {
+        this.scene.rig.resetView();
+        this.hud.gestures.toast('CAMERA: DEFAULT VIEW');
+      },
+      toggleHighContrast: () => {
+        this.setHighContrast(!this.highContrast);
+        return this.highContrast;
+      },
+      toggleReducedMotion: () => {
+        this.setReducedMotion(!this.reducedMotion);
+        return this.reducedMotion;
+      },
+    });
+
     // Mode switcher dock
     this.modeSwitcher = new ModeSwitcher(ui);
     this.modeSwitcher.onModeChange((mode) => this.switchMode(mode));

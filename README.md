@@ -1,83 +1,19 @@
-# Brahmastra AI — Neural Intelligence Core & Real-Life Gesture Suite
+# Brahmastra AI — Neural Intelligence Core & Celestial Simulation
 
-A browser-based, high-performance holographic AI platform combining **20,000 GPU-driven particles**, a **9-Planet Celestial Orbital Simulation**, real-time hand gesture control via webcam, and **4 real-life application modes** — all running locally in a browser with zero backend.
+A browser-based, high-performance holographic AI core built from ~20,000 GPU-driven particles and a live synapse network, integrated with a continuous **9-Planet Celestial Orbital Simulation**, controlled via real-time hand gestures through your webcam, mouse, or keyboard.
 
-Three.js + WebGL + GLSL for GPU rendering; MediaPipe Hand Landmarker for AI hand tracking. No backend, no frameworks, no camera data ever leaves your device.
+Three.js + WebGL + GLSL for GPU rendering; MediaPipe Hand Landmarker for machine learning vision tracking. No backend, no frameworks, zero latency, and no camera data ever leaves your device.
 
 ---
 
 ## 🌟 Key Features
 
 * **🧠 20,000 Particle Neural Core**: GPU vertex shaders compute breathing noise, mode morphing, attraction, contraction, and energy wave shockwaves.
-* **🪐 9-Planet Celestial Orbital Simulation**: Realistic Keplerian orbits and continuous axial rotation for all 9 planets (**Mercury, Venus, Earth with Moon, Mars, Jupiter, Saturn with rings, Uranus, Neptune, Pluto**).
-* **🔄 360° Omnidirectional Orbit Camera**: Drag your mouse to smoothly inspect the entire system from any angle.
-* **⚡ Electric Blue & Cyber Block Theme**: Aerospace telemetry visual language with glowing cyan accents, deep obsidian backdrops, and Orbitron typography.
-* **⏱️ Real-Time Palm Chrono Telemetry**: Live system timestamp, hand opening detection, open-duration stopwatch, and palm extension meters.
-* **🔒 100% Client-Side Privacy**: All camera vision inference runs inside a local Web Worker. Frames never leave your device.
-
----
-
-## 🩺 Real-Life Application Modes
-
-Brahmastra AI ships with **4 practical real-life modes**, accessible via the bottom dock or `M` key:
-
-### 🏥 Mode 1 — Hand Rehabilitation Tracker
-> *For stroke, arthritis, and post-surgery recovery patients.*
-
-Uses MediaPipe's 21 hand landmarks to measure:
-- **Per-finger extension** (5 live bars, 0–100%) — track which fingers are recovering
-- **Palm openness ring** — measure overall grip recovery progress
-- **Wrist rotation dial** — live angle in degrees, track rotation range
-- **Automatic rep counting** — FIST→OPEN_PALM counts as 1 grip rep automatically
-- **4 exercises**: Grip Strength, Index Isolation, Wrist Rotation, Finger Spread
-- **Session timer** + daily progress chart persisted in localStorage
-
-**Impact**: Stroke and arthritis patients can do guided exercises at home with real-time feedback. Zero hardware. Just a laptop webcam.
-
----
-
-### 🏭 Mode 2 — Touchless Control Panel
-> *For hospitals, cleanrooms, food factories — anywhere gloves prevent screen touch.*
-
-- 6 configurable **virtual holographic buttons** (Power, Lights, Alert, Confirm, Camera, Lock)
-- **POINT** gesture moves a glowing finger cursor to hover over buttons
-- **PINCH** gesture activates the hovered button — no touch needed
-- **FIST** triggers emergency hold state
-- Real-time **event log** with timestamps
-- Hover glow and activation flash animations
-
-**Impact**: Replaces expensive touchless-display solutions ($400+ Leap Motion devices). Works in any browser.
-
----
-
-### 🤟 Mode 3 — Sign Language Starter Kit
-> *For deaf and hearing-impaired communities — accessibility in the browser.*
-
-- **A–Z ASL finger spelling recognition** using 21-landmark extension patterns
-- **Live letter detection** with confidence percentage
-- **Hold-to-lock**: hold a gesture steady for 0.8s → letter locks into word
-- **Word Builder**: spell full words letter by letter
-- **Text-to-speech**: browser's Web Speech API speaks the completed word
-- **Practice Mode**: system shows a target letter, you form it, score is tracked
-- **ASL reference chart** — all 23 letters shown with descriptions
-
-**Impact**: Helps hearing-impaired people practice sign language. Free. No installation. Works offline after first load.
-
----
-
-### 🎤 Mode 4 — Presentation Controller
-> *For teachers, professors, and presenters — no clicker needed.*
-
-- **SWIPE RIGHT** → next slide (sends ArrowRight key)
-- **SWIPE LEFT** → previous slide (sends ArrowLeft key)
-- **POINT** gesture → red laser pointer on screen (follows index fingertip)
-- **FIST** → pause / black slide mode
-- **OPEN PALM** → resume presentation
-- Slide counter with progress bar
-- Action log with timestamps
-- Works with **Google Slides, PowerPoint Online, Canva, Keynote Web**
-
-**Impact**: Any teacher can walk away from their laptop and control slides with a hand gesture. No hardware needed.
+* **🪐 9-Planet Celestial Orbital Simulation**: Realistic Keplerian orbits and continuous axial rotation for all 9 planets (**Mercury, Venus, Earth with Moon, Mars, Jupiter with Great Red Spot, Saturn with holographic rings, Uranus, Neptune, Pluto**).
+* **🔄 360° Omnidirectional Orbit Camera**: Drag your mouse or touch screen to smoothly inspect the entire system from **Top View, Bottom View, Left View, Right View**, or any custom angle.
+* **⚡ Electric Blue & Cyber Block Theme**: Aerospace telemetry visual language featuring glowing electric cyan accents, deep obsidian backdrops, sci-fi viewport brackets, and Orbitron typography.
+* **⏱️ Real-Time Clock & Palm Chrono Telemetry**: Live system timestamp (`YYYY-MM-DD HH:MM:SS.mmm`), real-time hand opening detection, open-duration stopwatch, and palm extension meters.
+* **🔒 100% Client-Side Privacy**: All camera vision inference runs inside a local Web Worker. Frames are read into an `ImageBitmap` and instantly discarded.
 
 ---
 
@@ -88,23 +24,22 @@ npm install
 npm run dev          # http://127.0.0.1:5173
 ```
 
-Open the URL in your browser. The **bottom dock** shows all modes:
-- `🪐 BRAHMASTRA AI` — Home (neural core + planetary system)
-- `🏥 REHAB TRACKER` — Hand rehabilitation exercises
-- `🏭 CONTROL PANEL` — Touchless holographic buttons
-- `🤟 SIGN LANGUAGE` — ASL finger spelling
-- `🎤 PRESENTATION` — Gesture slide control
-
-Press **CAMERA** (or `G`) to activate webcam hand tracking.
+Open the URL in your browser and press **CAMERA** in the bottom-right HUD (or press <kbd>G</kbd> on your keyboard). `localhost` is treated as a secure origin, so the camera permission prompt will appear normally.
 
 ```bash
 npm run typecheck    # tsc --noEmit
-npm run build        # typecheck + production bundle into dist/
+npm run build        # typecheck + optimized production bundle into dist/
 npm run preview      # preview the production build locally
 ```
 
 > [!NOTE]
 > If serving `dist/` over a local network or public server, it must be hosted over **HTTPS** — modern browsers refuse `getUserMedia` access on insecure HTTP origins.
+
+### First-Time Model Cache
+
+Two static assets are downloaded once and cached by your browser:
+* MediaPipe Tasks Vision WASM runtime (`cdn.jsdelivr.net`)
+* `hand_landmarker.task` ML model (≈7 MB from Google Cloud CDN)
 
 ---
 
@@ -114,61 +49,92 @@ npm run preview      # preview the production build locally
 
 | Gesture | Action |
 | :--- | :--- |
-| **Open Palm** (5 fingers) | Core active — network illuminates, energy pulse fires |
-| **Pinch** (thumb + index) | Select / activate (Control Panel: activate button) |
-| **Fist** | Power Mode — pause in Presentation / emergency hold in Panel |
-| **Point** (index only) | Cursor / laser pointer |
-| **Swipe** (fast horizontal) | Next/prev slide (Presentation) or cycle orb mode (Home) |
+| **Open Palm** (5 fingers) | Core active — network illuminates, rings accelerate, energy pulse fires |
+| **Pinch** (thumb + index) | Grab the orb to rotate; fires an energy filament to the core |
+| **Fist** | Power Mode — cloud contracts and turns gold. Release for shockwave |
+| **Two Hands** | Move apart to expand, together to compress. Left hand steers, right modulates power |
+| **Point** (index only) | Holographic reticle cursor. Pinch while pointing to inspect nodes |
+| **Swipe** (fast horizontal) | Cycle through orb configurations |
 | **2 / 3 / 4 fingers** | Navigation / System analysis / Data visualisation modes |
+
+### 🖱️ Mouse & Touch (Full 360° Omnidirectional Controls)
+
+* **Drag Mouse (Left or Right Button) / Touch Drag**: Freely orbit camera 360° around all sides:
+  * **Drag Up**: Glides to **Top View** (look straight down onto all 9 concentric planetary orbits).
+  * **Drag Down**: Glides to **Bottom View** (look from underneath).
+  * **Drag Left / Right**: 360° horizontal orbit around the celestial system.
+* **Scroll Wheel / Pinch**: Zoom in close to individual planets or zoom out into deep space.
+* **Move Mouse**: Steer the holographic cursor reticle.
 
 ### ⌨️ Keyboard Shortcuts
 
 | Key | Action |
 | :--- | :--- |
-| `M` | Cycle through all 5 modes |
-| `Esc` | Return to Home mode / dismiss dialog |
-| `1`–`5` | Switch orb configuration (Neural, Reactor, Data, Energy, Scanner) |
+| `1`–`5` | Switch configuration (*Neural, Reactor, Data, Energy, Scanner*) |
 | `Space` | Fire energy pulse & celestial shockwave |
-| `T` | Snap to **Top View** |
-| `B` | Snap to **Bottom View** |
-| `L` / `K` | Snap to **Left / Right View** |
-| `P` | Toggle 9-Planet Celestial System |
-| `R` | Reset camera, orientation, and mode |
-| `G` | Toggle webcam gesture mode |
-| `D` | Toggle debug telemetry overlay |
+| `T` | Snap to **Top View** (straight down onto all planetary orbits) |
+| `B` | Snap to **Bottom View** (looking from underneath) |
+| `L` / `K` | Snap to **Left View** / **Right View** |
+| `P` | Toggle **9-Planet Celestial System** on/off |
+| `R` | Reset camera view, orientation, scale, and mode |
+| `G` | Toggle webcam gesture mode on/off |
+| `D` or `C` | Toggle debug telemetry overlay (FPS, inference, landmarks) |
 | `H` | Hide / show interface HUD |
+| `Esc` | Dismiss active notice / modal dialog |
+
+---
+
+## Real-Life Physical AI Modes
+
+Brahmastra AI includes 4 zero-hardware, webcam-powered real-world modules accessible from the bottom dock:
+
+### 1. 🏥 Hand Rehabilitation Tracker (`src/modes/RehabMode.ts`)
+* **1-Minute Workout Drill**: Eliminates static limits; runs a dedicated 60-second challenge timer tracking real-time cadence and reps completed in 1 minute.
+* **Biometric Telemetry**: Live per-finger extension bars (0%–100%), 360° palm openness gauge, and wrist rotation dial (-90° to +90°).
+* **Exercises**: Grip Strength (Fist to Open Palm), Index Isolation, Wrist Rotation, and Finger Spread. Records Personal Best Reps/Min.
+
+### 2. 🎛️ Touchless Machine Control Console (`src/modes/ControlPanelMode.ts`)
+* **Analog Touchless Sliders**: Point or pinch in mid-air over slider tracks to adjust **Master Audio Volume** (0%–100%), **Display & HUD Brightness** (50%–150%), **Celestial Orbit Speed** (0.0x freeze to 5.0x hyperwarp), and **3D Camera Distance**.
+* **Tactile Air Switches**: Pinch in mid-air to toggle **Fullscreen Mode** (`requestFullscreen`), **Audio Synthesizer**, **9 Planetary Orbits**, **Top-Down Celestial View**, and **High Contrast**.
+* **Live System Telemetry**: Real-time FPS, input modality, and audio bus telemetry.
+
+### 3. 📓 Touchless Air-Notebook & Speech Voice (`src/modes/SignLanguageMode.ts`)
+* **Ruled Notebook Aesthetic**: Classical ruled notebook paper with horizontal blue lines, vertical red margin, and mid-air ink drawing.
+* **Sensorless Air-Writing**: Point index finger or pinch in mid-air to write words, letters, and cursive freely using webcam tracking.
+* **Practice Mode with Guidelines**: Full word practice with dashed tracing guidelines (`HELLO`, `BRAHMASTRA`, `WELCOME`, `THANK YOU`, `PHYSICAL AI`).
+* **🔊 Loud Speech Pronunciation**: Touch or click the **PRONOUNCE** button to trigger the browser's Web Speech Synthesis API (`SpeechSynthesisUtterance`), loudly speaking what was written in the notebook.
+
+### 4. 🎤 Stage Keynote Presentation Controller (`src/modes/PresentationMode.ts`)
+* **Full Interactive Slide Deck**: 5 keynote presentation slides detailing Brahmastra AI's vision, neural architecture, and zero-hardware advantage.
+* **🔴 Air Laser Pointer**: Live glowing red laser dot that tracks the presenter's pointing finger with particle beam flare.
+* **🔦 Stage Spotlight Mode**: Darkens surrounding slide content into a soft vignette, casting a focused theatrical spotlight on the bullet point or diagram pointed to.
+* **👋 Air Swipe & Blackout**: Swipe hand right/left to navigate slides. Clench fist to toggle **Stage Blackout Screen** to bring audience focus back to the speaker.
+* **⏱️ Meeting Timer & Teleprompter**: Live presenter elapsed talk timer with pacing indicators and floating speaker notes drawer.
 
 ---
 
 ## System Architecture
 
-### 1. Real-Life Modes Engine (`src/modes/`)
-```
-ModeManager.ts        — State machine: HOME | REHAB | PANEL | SIGN | SLIDES
-ModeSwitcher.ts       — Bottom dock tab bar (5 glowing tabs)
-RehabMode.ts          — Finger bars, palm ring, wrist dial, rep counter
-ControlPanelMode.ts   — Virtual buttons, finger cursor, pinch-activate
-SignLanguageMode.ts   — ASL recognition, word builder, text-to-speech
-PresentationMode.ts   — Slide control, laser pointer, swipe navigation
-```
+### 1. Planetary Celestial Mechanics (`src/effects/PlanetarySystem.ts`)
+* **9 Concentric Keplerian Orbits**: Scaled orbital velocities where inner terrestrial planets revolve faster and outer gas giants orbit majestically.
+* **Continuous Axial Rotation**: Planets spin continuously on their own tilted rotation axes (Earth at 23.5° / 0.41 rad, Uranus tipped on its side at ~98°).
+* **Procedural Surface Textures**: Generated at startup on dynamic HTML5 canvases (Earth's oceans and continents, Jupiter's storm bands and Great Red Spot, Mars' basalt and polar ice, Saturn's rings with Cassini division).
+* **Resonance Reaction**: When a power pulse fires, planetary orbit lines and atmospheric rims flare with cosmic energy.
 
-### 2. Hand Tracking Engine (`src/vision/`)
+### 2. 360° Omnidirectional Camera Rig (`src/scene/CameraRig.ts`)
+* **Spherical Coordinate Navigation**: Uses `(phi, theta, distance)` to guarantee smooth, continuous camera rotation from top pole to bottom pole without gimbal lock.
+* **Cinematic Damping & Drift**: Subtle figure-eight camera breathing when idle, damping mouse input for smooth aerospace camera tracking.
+
+### 3. GPU Vertex-Shader Motion (`src/shaders/common.glsl`)
+* The core and synapse network execute within 5 total draw calls on the GPU.
+* The CPU never loops over individual particles per frame; all morphing, noise, and contraction run entirely inside GLSL shaders.
+
+### 4. Vision Web Worker Pipeline (`src/vision/`)
 ```
 Webcam Frame → ImageBitmap → Web Worker → MediaPipe HandLandmarker
-             → LandmarkSmoother → GestureEngine → InputAdapter → Modes
+             → One Euro Filter → GestureEngine → HandInteraction
 ```
-- Tracks **21 landmarks** per hand with 3D world coordinates
-- Computes per-finger extension (0–1), palmOpenness, palmRoll, palmNormal, velocity
-- Runs at ~30 Hz in a Web Worker — never stalls the 60+ FPS render loop
-
-### 3. Planetary Celestial Mechanics (`src/effects/PlanetarySystem.ts`)
-- 9 Keplerian orbits with scaled velocities
-- Procedural surface textures generated on HTML5 canvas at startup
-- Resonance reaction: power pulses flare orbit lines and atmospheric rims
-
-### 4. GPU Vertex-Shader Motion (`src/shaders/`)
-- Core + synapse network execute within 5 total draw calls
-- All morphing, noise, and contraction run inside GLSL shaders on the GPU
+* Runs in a dedicated Web Worker at ~30 Hz so computer vision inference never stalls the 60+ FPS Three.js render loop.
 
 ---
 
@@ -176,38 +142,32 @@ Webcam Frame → ImageBitmap → Web Worker → MediaPipe HandLandmarker
 
 ```
 src/
-  main.ts                  Application wiring, loop, mode integration
-  config.ts                Tunable parameters, colors, camera distances
-  modes/
-    ModeManager.ts         Mode state machine (HOME/REHAB/PANEL/SIGN/SLIDES)
-    ModeSwitcher.ts        Bottom dock tab bar component
-    RehabMode.ts           Hand rehabilitation tracker
-    ControlPanelMode.ts    Touchless holographic control panel
-    SignLanguageMode.ts    ASL sign language recognition kit
-    PresentationMode.ts    Gesture-controlled presentation controller
+  main.ts                  Application wiring, loop, and mouse orbit controls
+  config.ts                Tunable parameters, colors, and camera distances
   scene/
     CameraRig.ts           360° omnidirectional orbital camera rig
-    SceneManager.ts        Scene graph, lights, starfield
+    SceneManager.ts        Scene graph, ambient & rim lights, starfield
+    Background.ts          Procedural background starfield and haze
     PostProcessing.ts      Bloom and post-processing pipeline
   orb/
     NeuralOrb.ts           Core particle cloud and synapse network
+    EnergyCore.ts          Inner glowing nuclear core
+    OrbitalRings.ts        Concentric aerospace rings
     OrbModes.ts            5 morphing particle geometries
   effects/
-    PlanetarySystem.ts     9-Planet celestial orbital simulation
+    PlanetarySystem.ts     9-Planet celestial orbital simulation & textures
     OrbitalNodes.ts        Interactive holographic node telemetry
     ParticleBurst.ts       Shockwave particle explosions
+    HolographicBeam.ts     Energy filaments connecting hands to core
+    Reticle.ts             Futuristic HUD cursor reticle
   vision/
     HandTracker.ts         Camera stream and Web Worker coordinator
     GestureEngine.ts       21-landmark geometric gesture classification
-    LandmarkSmoother.ts    One Euro Filter for low-jitter tracking
-  interaction/
-    InputAdapter.ts        Converts tracked hands to InputHand interface
-    GestureStateMachine.ts Stable system-level gesture state machine
-    MouseFallback.ts       Mouse/touch orbital navigation fallback
+    OneEuroFilter.ts       Low-jitter, low-latency landmark filtering
   ui/
-    HUD.ts                 Left/right telemetry panels & Palm Chrono
+    HUD.ts                 Left/right telemetry panels & Palm Chrono block
     SystemStatus.ts        Top identity block & real-time clock
-    styles.css             Electric Blue & Cyber Block styling + mode CSS
+    styles.css             Electric Blue & Cyber Block styling
 ```
 
 ---
@@ -215,8 +175,6 @@ src/
 ## Author
 
 Developed & Maintained by **Sainath**.
-
-GitHub: [sainathgoud1229/Brahmastra-AI](https://github.com/sainathgoud1229/Brahmastra-AI)
 
 ## License
 

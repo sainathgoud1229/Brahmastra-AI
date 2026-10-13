@@ -51,6 +51,13 @@ export class AudioEngine {
     }
   }
 
+  setVolume(vol: number): void {
+    if (this.master && this.context) {
+      const clamped = Math.max(0, Math.min(1, vol));
+      this.master.gain.setTargetAtTime(clamped * AUDIO.masterGain, this.context.currentTime, 0.05);
+    }
+  }
+
   private async ensureContext(): Promise<AudioContext> {
     if (!this.context) {
       const Ctor =

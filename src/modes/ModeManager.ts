@@ -13,11 +13,11 @@ export interface ModeChangeEvent {
 type ModeListener = (event: ModeChangeEvent) => void;
 
 export const MODE_META: Record<AppMode, { label: string; icon: string; desc: string }> = {
-  HOME:   { label: 'BRAHMASTRA AI',       icon: '🪐', desc: 'Neural Intelligence Core' },
-  REHAB:  { label: 'REHAB TRACKER',       icon: '🏥', desc: 'Hand Rehabilitation' },
-  PANEL:  { label: 'CONTROL PANEL',       icon: '🏭', desc: 'Touchless Interface' },
-  SIGN:   { label: 'SIGN LANGUAGE',       icon: '🤟', desc: 'Accessibility Kit' },
-  SLIDES: { label: 'PRESENTATION',        icon: '🎤', desc: 'Gesture Slides Control' },
+  HOME:   { label: 'BRAHMASTRA AI',         icon: '🪐', desc: 'Neural Intelligence Core' },
+  REHAB:  { label: 'REHAB TRACKER',         icon: '🏥', desc: 'Hand Rehabilitation & 1-Min Cadence' },
+  PANEL:  { label: 'CONTROL CONSOLE',       icon: '🎛️', desc: 'Real Touchless System Console' },
+  SIGN:   { label: 'AIR NOTEBOOK & VOICE',  icon: '📓', desc: 'Mid-Air Writing & Speech Pronunciation' },
+  SLIDES: { label: 'PRESENTATION DECK',     icon: '🎤', desc: 'Keynote Stage & Gesture Controller' },
 };
 
 export class ModeManager {

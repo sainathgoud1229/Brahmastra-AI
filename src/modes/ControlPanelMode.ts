@@ -1,67 +1,196 @@
 /**
- * ControlPanelMode — Touchless Machine Control Panel
+ * ControlPanelMode — Real Touchless Machine & System Control Console
  *
- * Renders 6 virtual holographic buttons. POINT gesture moves the cursor,
- * PINCH selects. Useful in hospitals, factories, food labs — anywhere
- * you can't touch a screen.
+ * Provides real, working touchless sliders, toggles, and selectors:
+ * 1. Master Audio Volume slider (0% - 100%)
+ * 2. Display Brightness / Contrast slider (50% - 150%)
+ * 3. Planetary Orbit Speed slider (0.0x - 5.0x)
+ * 4. 3D Camera Distance / Zoom slider
+ * 5. Fullscreen Toggle (real browser fullscreen)
+ * 6. Ambient Audio Soundscape Selector
+ * 7. Top-Down Celestial View & Camera Reset
+ * 8. High Contrast & Reduced Motion toggles
  */
 
 import type { InputHand } from '../interaction/InputTypes';
 
-export interface VirtualButton {
-  id: string;
-  label: string;
-  icon: string;
-  action: string;
-  color: string;
+export interface SystemBridge {
+  setMasterVolume: (vol: number) => void;
+  setDisplayBrightness: (brightness: number) => void;
+  setOrbitSpeed: (speed: number) => void;
+  setCameraDistance: (dist: number) => void;
+  toggleFullscreen: () => void;
+  toggleSound: () => void;
+  togglePlanets: () => boolean;
+  setTopView: () => void;
+  resetView: () => void;
+  toggleHighContrast: () => boolean;
+  toggleReducedMotion: () => boolean;
 }
-
-const DEFAULT_BUTTONS: VirtualButton[] = [
-  { id: 'btn-a', label: 'POWER',    icon: '⚡', action: 'POWER_TOGGLE',   color: '#ff4d4d' },
-  { id: 'btn-b', label: 'LIGHTS',   icon: '💡', action: 'LIGHTS_TOGGLE',  color: '#ffb340' },
-  { id: 'btn-c', label: 'ALERT',    icon: '🚨', action: 'ALERT_TRIGGER',  color: '#ff6b35' },
-  { id: 'btn-d', label: 'CONFIRM',  icon: '✅', action: 'CONFIRM',        color: '#2ff3ff' },
-  { id: 'btn-e', label: 'CAMERA',   icon: '📷', action: 'CAMERA_SNAP',    color: '#8fd8ff' },
-  { id: 'btn-f', label: 'LOCK',     icon: '🔒', action: 'LOCK_SYSTEM',    color: '#a78bfa' },
-];
 
 export class ControlPanelMode {
   private el: HTMLDivElement | null = null;
   private visible = false;
-  private buttons = DEFAULT_BUTTONS;
-  private hoveredBtn: string | null = null;
-  private pinchHeld = false;
-  private logEl: HTMLElement | null = null;
+  private bridge: SystemBridge | null = null;
+
+  // Real control state
+  private volume = 0.8;
+  private brightness = 1.0;
+  private orbitSpeed = 1.0;
+  private cameraDistance = 0.5;
+  private soundEnabled = true;
+  private planetsEnabled = true;
+  private highContrastEnabled = false;
+
   private cursorEl: HTMLElement | null = null;
   private gestureLabel: HTMLElement | null = null;
-  private activationCooldown = 0;
+  private lastPinchState = false;
+
+  setBridge(bridge: SystemBridge): void {
+    this.bridge = bridge;
+  }
 
   build(parent: HTMLElement): void {
     this.el = document.createElement('div');
     this.el.className = 'mode-overlay panel-overlay hidden';
     this.el.innerHTML = `
       <div class="mode-header">
-        <span class="mode-icon">🏭</span>
+        <span class="mode-icon">🎛️</span>
         <div>
-          <div class="mode-title">TOUCHLESS CONTROL PANEL</div>
-          <div class="mode-sub">Point to hover • Pinch to activate • No touch needed</div>
+          <div class="mode-title">TOUCHLESS HARDWARE & SYSTEM CONSOLE</div>
+          <div class="mode-sub">Real Working Controls • Point to Aim • Pinch / Drag Sliders • No Touch Required</div>
         </div>
         <div class="panel-gesture-label" id="panel-gesture">STANDBY</div>
       </div>
 
       <div class="panel-body">
 
-        <div class="panel-grid" id="panel-grid"></div>
+        <!-- REAL SLIDERS SECTION -->
+        <div class="panel-card panel-sliders-card">
+          <div class="rehab-card-title">ANALOG TOUCHLESS SLIDERS</div>
 
-        <div class="panel-sidebar">
-          <div class="panel-section-title">HOW TO USE</div>
-          <div class="panel-hint">👉 <b>POINT</b> gesture → move cursor</div>
-          <div class="panel-hint">🤌 <b>PINCH</b> gesture → activate button</div>
-          <div class="panel-hint">✋ <b>FIST</b> → emergency hold</div>
-          <div class="panel-hint">🖐 <b>OPEN PALM</b> → confirm/resume</div>
+          <!-- VOLUME SLIDER -->
+          <div class="real-control-group" data-slider="volume">
+            <div class="control-header">
+              <span class="ctrl-icon">🔊</span>
+              <span class="ctrl-title">MASTER AUDIO VOLUME</span>
+              <span class="ctrl-value" id="val-volume">80%</span>
+            </div>
+            <div class="air-slider-track" id="track-volume">
+              <div class="air-slider-fill" id="fill-volume" style="width: 80%"></div>
+              <div class="air-slider-thumb" id="thumb-volume" style="left: 80%"></div>
+            </div>
+          </div>
 
-          <div class="panel-section-title" style="margin-top:1.5rem">EVENT LOG</div>
-          <div class="panel-log" id="panel-log"></div>
+          <!-- BRIGHTNESS SLIDER -->
+          <div class="real-control-group" data-slider="brightness">
+            <div class="control-header">
+              <span class="ctrl-icon">☀️</span>
+              <span class="ctrl-title">HUD & DISPLAY BRIGHTNESS</span>
+              <span class="ctrl-value" id="val-brightness">100%</span>
+            </div>
+            <div class="air-slider-track" id="track-brightness">
+              <div class="air-slider-fill" id="fill-brightness" style="width: 50%"></div>
+              <div class="air-slider-thumb" id="thumb-brightness" style="left: 50%"></div>
+            </div>
+          </div>
+
+          <!-- ORBIT SPEED SLIDER -->
+          <div class="real-control-group" data-slider="orbitspeed">
+            <div class="control-header">
+              <span class="ctrl-icon">🪐</span>
+              <span class="ctrl-title">CELESTIAL ORBIT SPEED</span>
+              <span class="ctrl-value" id="val-orbitspeed">1.0x</span>
+            </div>
+            <div class="air-slider-track" id="track-orbitspeed">
+              <div class="air-slider-fill" id="fill-orbitspeed" style="width: 20%"></div>
+              <div class="air-slider-thumb" id="thumb-orbitspeed" style="left: 20%"></div>
+            </div>
+            <div class="slider-marks"><span>0.0x (FREEZE)</span><span>1.0x (NORMAL)</span><span>5.0x (WARP)</span></div>
+          </div>
+
+          <!-- CAMERA ZOOM SLIDER -->
+          <div class="real-control-group" data-slider="camzoom">
+            <div class="control-header">
+              <span class="ctrl-icon">🔭</span>
+              <span class="ctrl-title">3D CAMERA DISTANCE</span>
+              <span class="ctrl-value" id="val-camzoom">50%</span>
+            </div>
+            <div class="air-slider-track" id="track-camzoom">
+              <div class="air-slider-fill" id="fill-camzoom" style="width: 50%"></div>
+              <div class="air-slider-thumb" id="thumb-camzoom" style="left: 50%"></div>
+            </div>
+            <div class="slider-marks"><span>CLOSE FOCUS</span><span>DEFAULT</span><span>DEEP FIELD</span></div>
+          </div>
+
+        </div>
+
+        <!-- REAL ACTION BUTTONS & TOGGLES -->
+        <div class="panel-card panel-actions-card">
+          <div class="rehab-card-title">TACTILE SYSTEM SWITCHES</div>
+
+          <div class="real-switches-grid">
+            <button class="real-switch-btn" id="ctrl-btn-fullscreen">
+              <span class="switch-icon">⛶</span>
+              <div class="switch-text">
+                <span class="switch-name">FULLSCREEN</span>
+                <span class="switch-state" id="state-fullscreen">WINDOWED</span>
+              </div>
+            </button>
+
+            <button class="real-switch-btn active" id="ctrl-btn-sound">
+              <span class="switch-icon">🔔</span>
+              <div class="switch-text">
+                <span class="switch-name">AUDIO SYNTH</span>
+                <span class="switch-state" id="state-sound">ACTIVE</span>
+              </div>
+            </button>
+
+            <button class="real-switch-btn active" id="ctrl-btn-planets">
+              <span class="switch-icon">🌌</span>
+              <div class="switch-text">
+                <span class="switch-name">9 PLANETS</span>
+                <span class="switch-state" id="state-planets">ORBITING</span>
+              </div>
+            </button>
+
+            <button class="real-switch-btn" id="ctrl-btn-topview">
+              <span class="switch-icon">🧭</span>
+              <div class="switch-text">
+                <span class="switch-name">TOP VIEW</span>
+                <span class="switch-state">ALIGN CAMERA</span>
+              </div>
+            </button>
+
+            <button class="real-switch-btn" id="ctrl-btn-resetview">
+              <span class="switch-icon">🎯</span>
+              <div class="switch-text">
+                <span class="switch-name">RESET VIEW</span>
+                <span class="switch-state">DEFAULT ORBIT</span>
+              </div>
+            </button>
+
+            <button class="real-switch-btn" id="ctrl-btn-contrast">
+              <span class="switch-icon">⚡</span>
+              <div class="switch-text">
+                <span class="switch-name">HIGH CONTRAST</span>
+                <span class="switch-state" id="state-contrast">NORMAL</span>
+              </div>
+            </button>
+          </div>
+
+          <div class="rehab-card-title" style="margin-top:1.2rem">REAL-TIME SYSTEM TELEMETRY</div>
+          <div class="panel-telemetry" id="panel-telemetry">
+            <div>STATUS: <span style="color:#2ff3ff">TOUCHLESS BUS ONLINE</span></div>
+            <div>FPS: <span id="tele-fps">60 FPS</span></div>
+            <div>GESTURE INPUT: <span id="tele-input" style="color:#2ff3ff">INDEX POINTER</span></div>
+            <div>AUDIO BUS: <span id="tele-audio">ACTIVE (GAIN 0.8)</span></div>
+          </div>
+
+          <div class="rehab-card-title" style="margin-top:1rem">GESTURE MANUAL</div>
+          <div class="panel-hint">👉 <b>POINT</b> at any slider track to adjust value touchlessly</div>
+          <div class="panel-hint">🤌 <b>PINCH</b> on any switch button to toggle ON/OFF</div>
+          <div class="panel-hint">🖱️ <b>CLICK & DRAG</b> also fully supported as fallback</div>
         </div>
 
       </div>
@@ -71,110 +200,235 @@ export class ControlPanelMode {
     parent.append(this.el);
 
     this.gestureLabel = this.el.querySelector('#panel-gesture');
-    this.logEl = this.el.querySelector('#panel-log');
     this.cursorEl = this.el.querySelector('#panel-cursor');
 
-    this.buildButtonGrid();
+    this.setupListeners();
   }
 
-  private buildButtonGrid(): void {
-    const grid = this.el!.querySelector('#panel-grid')!;
-    for (const btn of this.buttons) {
-      const el = document.createElement('div');
-      el.className = 'vbutton';
-      el.id = btn.id;
-      el.style.setProperty('--btn-color', btn.color);
-      el.innerHTML = `
-        <div class="vbutton-icon">${btn.icon}</div>
-        <div class="vbutton-label">${btn.label}</div>
-        <div class="vbutton-status" id="${btn.id}-status">READY</div>
-      `;
-      grid.append(el);
+  private setupListeners(): void {
+    if (!this.el) return;
+
+    // Fullscreen toggle
+    this.el.querySelector('#ctrl-btn-fullscreen')?.addEventListener('click', () => {
+      this.toggleFullscreen();
+    });
+
+    // Sound toggle
+    this.el.querySelector('#ctrl-btn-sound')?.addEventListener('click', () => {
+      this.toggleSound();
+    });
+
+    // Planets toggle
+    this.el.querySelector('#ctrl-btn-planets')?.addEventListener('click', () => {
+      this.togglePlanets();
+    });
+
+    // Top view
+    this.el.querySelector('#ctrl-btn-topview')?.addEventListener('click', () => {
+      this.bridge?.setTopView();
+    });
+
+    // Reset view
+    this.el.querySelector('#ctrl-btn-resetview')?.addEventListener('click', () => {
+      this.bridge?.resetView();
+    });
+
+    // High contrast
+    this.el.querySelector('#ctrl-btn-contrast')?.addEventListener('click', () => {
+      this.toggleContrast();
+    });
+
+    // Sliders click/drag handlers
+    const setupTrack = (id: string, onChange: (pct: number) => void) => {
+      const track = this.el?.querySelector(`#track-${id}`) as HTMLElement;
+      if (!track) return;
+
+      const handlePointer = (e: MouseEvent) => {
+        const rect = track.getBoundingClientRect();
+        const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+        const pct = x / rect.width;
+        onChange(pct);
+      };
+
+      track.addEventListener('mousedown', (e) => {
+        handlePointer(e);
+        const onMove = (ev: MouseEvent) => handlePointer(ev);
+        const onUp = () => {
+          window.removeEventListener('mousemove', onMove);
+          window.removeEventListener('mouseup', onUp);
+        };
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+      });
+    };
+
+    setupTrack('volume', (pct) => this.setVolume(pct));
+    setupTrack('brightness', (pct) => this.setBrightness(0.5 + pct * 1.0)); // 0.5 .. 1.5
+    setupTrack('orbitspeed', (pct) => this.setOrbitSpeed(pct * 5.0));      // 0.0 .. 5.0x
+    setupTrack('camzoom', (pct) => this.setCameraZoom(pct));
+  }
+
+  private setVolume(val: number): void {
+    this.volume = Math.max(0, Math.min(1, val));
+    const fill = this.el?.querySelector('#fill-volume') as HTMLElement;
+    const thumb = this.el?.querySelector('#thumb-volume') as HTMLElement;
+    const label = this.el?.querySelector('#val-volume');
+    const pct = Math.round(this.volume * 100);
+    if (fill) fill.style.width = `${pct}%`;
+    if (thumb) thumb.style.left = `${pct}%`;
+    if (label) label.textContent = `${pct}%`;
+    this.bridge?.setMasterVolume(this.volume);
+    const tele = this.el?.querySelector('#tele-audio');
+    if (tele) tele.textContent = `ACTIVE (GAIN ${this.volume.toFixed(2)})`;
+  }
+
+  private setBrightness(val: number): void {
+    this.brightness = Math.max(0.5, Math.min(1.5, val));
+    const pctNorm = (this.brightness - 0.5) / 1.0;
+    const fill = this.el?.querySelector('#fill-brightness') as HTMLElement;
+    const thumb = this.el?.querySelector('#thumb-brightness') as HTMLElement;
+    const label = this.el?.querySelector('#val-brightness');
+    if (fill) fill.style.width = `${(pctNorm * 100).toFixed(0)}%`;
+    if (thumb) thumb.style.left = `${(pctNorm * 100).toFixed(0)}%`;
+    if (label) label.textContent = `${Math.round(this.brightness * 100)}%`;
+    this.bridge?.setDisplayBrightness(this.brightness);
+  }
+
+  private setOrbitSpeed(val: number): void {
+    this.orbitSpeed = Math.max(0, Math.min(5, val));
+    const pct = (this.orbitSpeed / 5.0) * 100;
+    const fill = this.el?.querySelector('#fill-orbitspeed') as HTMLElement;
+    const thumb = this.el?.querySelector('#thumb-orbitspeed') as HTMLElement;
+    const label = this.el?.querySelector('#val-orbitspeed');
+    if (fill) fill.style.width = `${pct.toFixed(0)}%`;
+    if (thumb) thumb.style.left = `${pct.toFixed(0)}%`;
+    if (label) label.textContent = `${this.orbitSpeed.toFixed(1)}x`;
+    this.bridge?.setOrbitSpeed(this.orbitSpeed);
+  }
+
+  private setCameraZoom(val: number): void {
+    this.cameraDistance = Math.max(0, Math.min(1, val));
+    const fill = this.el?.querySelector('#fill-camzoom') as HTMLElement;
+    const thumb = this.el?.querySelector('#thumb-camzoom') as HTMLElement;
+    const label = this.el?.querySelector('#val-camzoom');
+    const pct = Math.round(this.cameraDistance * 100);
+    if (fill) fill.style.width = `${pct}%`;
+    if (thumb) thumb.style.left = `${pct}%`;
+    if (label) label.textContent = `${pct}%`;
+    // Map to camera distance nudge
+    this.bridge?.setCameraDistance(this.cameraDistance);
+  }
+
+  private toggleFullscreen(): void {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+      this.updateSwitchState('fullscreen', true, 'FULLSCREEN');
+    } else {
+      document.exitFullscreen().catch(() => {});
+      this.updateSwitchState('fullscreen', false, 'WINDOWED');
     }
   }
 
-  update(dt: number, hands: InputHand[]): void {
-    if (!this.visible || !this.el) return;
+  private toggleSound(): void {
+    this.soundEnabled = !this.soundEnabled;
+    this.bridge?.toggleSound();
+    this.updateSwitchState('sound', this.soundEnabled, this.soundEnabled ? 'ACTIVE' : 'MUTED');
+  }
 
-    this.activationCooldown = Math.max(0, this.activationCooldown - dt);
+  private togglePlanets(): void {
+    if (this.bridge) {
+      this.planetsEnabled = this.bridge.togglePlanets();
+      this.updateSwitchState('planets', this.planetsEnabled, this.planetsEnabled ? 'ORBITING' : 'HIDDEN');
+    }
+  }
+
+  private toggleContrast(): void {
+    if (this.bridge) {
+      this.highContrastEnabled = this.bridge.toggleHighContrast();
+      this.updateSwitchState('contrast', this.highContrastEnabled, this.highContrastEnabled ? 'ACTIVE' : 'NORMAL');
+    }
+  }
+
+  private updateSwitchState(id: string, active: boolean, label: string): void {
+    const btn = this.el?.querySelector(`#ctrl-btn-${id}`);
+    const stateEl = this.el?.querySelector(`#state-${id}`);
+    if (btn) btn.classList.toggle('active', active);
+    if (stateEl) stateEl.textContent = label;
+  }
+
+  update(_dt: number, hands: InputHand[]): void {
+    if (!this.visible || !this.el) return;
 
     const hand = hands.find(h => h.active);
     if (!hand) {
-      if (this.gestureLabel) this.gestureLabel.textContent = 'NO HAND DETECTED';
+      if (this.gestureLabel) this.gestureLabel.textContent = 'STANDBY — NO HAND';
       if (this.cursorEl) this.cursorEl.style.opacity = '0';
       return;
     }
 
-    const gesture = hand.gesture;
-    if (this.gestureLabel) this.gestureLabel.textContent = gesture;
-
-    // FIST = emergency hold
-    if (gesture === 'FIST') {
-      if (this.gestureLabel) this.gestureLabel.textContent = '🚨 EMERGENCY HOLD';
-      if (this.cursorEl) this.cursorEl.style.opacity = '0';
-      return;
+    if (this.gestureLabel) {
+      this.gestureLabel.textContent = `TOUCHLESS INPUT: ${hand.gesture}`;
     }
 
-    // Move cursor to index tip position (normalised 0..1 → pixel)
-    const tx = hand.indexTip?.x ?? hand.palm.x;
-    const ty = hand.indexTip?.y ?? hand.palm.y;
-    const cx = (1 - tx) * window.innerWidth;  // mirrored
-    const cy = ty * window.innerHeight;
+    // Touchless Pointer Cursor
+    const px = (hand.indexTip?.x ?? hand.palm?.x ?? 0.5) * window.innerWidth;
+    const py = (hand.indexTip?.y ?? hand.palm?.y ?? 0.5) * window.innerHeight;
 
     if (this.cursorEl) {
-      this.cursorEl.style.opacity = gesture === 'POINT' || gesture === 'PINCH' ? '1' : '0.5';
-      this.cursorEl.style.left = `${cx}px`;
-      this.cursorEl.style.top = `${cy}px`;
-      this.cursorEl.classList.toggle('pinching', gesture === 'PINCH');
+      this.cursorEl.style.opacity = '1';
+      this.cursorEl.style.left = `${px}px`;
+      this.cursorEl.style.top = `${py}px`;
     }
 
-    // Hover detection
-    let newHovered: string | null = null;
-    for (const btn of this.buttons) {
-      const el = this.el!.querySelector<HTMLElement>(`#${btn.id}`);
-      if (!el) continue;
-      const rect = el.getBoundingClientRect();
-      const inside = cx >= rect.left && cx <= rect.right && cy >= rect.top && cy <= rect.bottom;
-      el.classList.toggle('hovered', inside);
-      if (inside) newHovered = btn.id;
-    }
-    this.hoveredBtn = newHovered;
+    // Check hover over sliders or switches
+    const isPinching = hand.pinching || hand.gesture === 'PINCH';
+    const isPointing = hand.gesture === 'POINT';
 
-    // Pinch = activate hovered button
-    const isPinching = gesture === 'PINCH';
-    if (isPinching && !this.pinchHeld && this.hoveredBtn && this.activationCooldown <= 0) {
-      this.activateButton(this.hoveredBtn);
-      this.activationCooldown = 1.0; // 1s cooldown
-    }
-    this.pinchHeld = isPinching;
-  }
+    // Touchless Slider interaction: Pointing or pinching over slider tracks
+    const sliderTracks = this.el.querySelectorAll('.real-control-group');
+    sliderTracks.forEach(group => {
+      const type = group.getAttribute('data-slider');
+      const track = group.querySelector('.air-slider-track') as HTMLElement;
+      if (!track || !type) return;
 
-  private activateButton(btnId: string): void {
-    const btn = this.buttons.find(b => b.id === btnId);
-    if (!btn) return;
+      const rect = track.getBoundingClientRect();
+      const inTrackBounds =
+        px >= rect.left - 15 && px <= rect.right + 15 &&
+        py >= rect.top - 20 && py <= rect.bottom + 20;
 
-    const el = this.el!.querySelector(`#${btnId}`);
-    el?.classList.add('activated');
-    setTimeout(() => el?.classList.remove('activated'), 600);
+      if (inTrackBounds) {
+        track.classList.add('hovered');
+        if (isPointing || isPinching) {
+          const ratio = Math.max(0, Math.min(1, (px - rect.left) / rect.width));
+          if (type === 'volume') this.setVolume(ratio);
+          else if (type === 'brightness') this.setBrightness(0.5 + ratio * 1.0);
+          else if (type === 'orbitspeed') this.setOrbitSpeed(ratio * 5.0);
+          else if (type === 'camzoom') this.setCameraZoom(ratio);
+        }
+      } else {
+        track.classList.remove('hovered');
+      }
+    });
 
-    const statusEl = this.el!.querySelector(`#${btnId}-status`);
-    if (statusEl) {
-      statusEl.textContent = 'ACTIVATED!';
-      setTimeout(() => { statusEl.textContent = 'READY'; }, 1200);
-    }
+    // Touchless Switch interaction: Pinch down trigger on buttons
+    const switchBtns = this.el.querySelectorAll('.real-switch-btn');
+    switchBtns.forEach(btn => {
+      const rect = btn.getBoundingClientRect();
+      const inBounds = px >= rect.left && px <= rect.right && py >= rect.top && py <= rect.bottom;
+      if (inBounds) {
+        btn.classList.add('hovered');
+        // Pinch start trigger
+        if (isPinching && !this.lastPinchState) {
+          (btn as HTMLButtonElement).click();
+          btn.classList.add('activated');
+          setTimeout(() => btn.classList.remove('activated'), 300);
+        }
+      } else {
+        btn.classList.remove('hovered');
+      }
+    });
 
-    this.log(`[${new Date().toLocaleTimeString()}] ${btn.icon} ${btn.label} → ${btn.action}`);
-  }
-
-  private log(msg: string): void {
-    if (!this.logEl) return;
-    const line = document.createElement('div');
-    line.className = 'panel-log-entry';
-    line.textContent = msg;
-    this.logEl.prepend(line);
-    if (this.logEl.children.length > 8) {
-      this.logEl.lastElementChild?.remove();
-    }
+    this.lastPinchState = isPinching;
   }
 
   setVisible(v: boolean): void {

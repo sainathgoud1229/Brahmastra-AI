@@ -467,6 +467,12 @@ export class PlanetarySystem {
     this.pulseEnergy = 1.0;
   }
 
+    public timeScale = 1.0;
+
+  setTimeScale(scale: number): void {
+    this.timeScale = Math.max(0, Math.min(10, scale));
+  }
+
   update(dt: number, coreActivation: number): void {
     if (!this.visible) return;
 
@@ -475,7 +481,7 @@ export class PlanetarySystem {
       this.pulseEnergy = Math.max(0, this.pulseEnergy - dt * 1.5);
     }
 
-    const speedMultiplier = 1.0 + coreActivation * 0.6 + this.pulseEnergy * 1.2;
+    const speedMultiplier = (1.0 + coreActivation * 0.6 + this.pulseEnergy * 1.2) * this.timeScale;
 
     for (let i = 0; i < this.planets.length; i++) {
       const p = this.planets[i];
@@ -486,7 +492,7 @@ export class PlanetarySystem {
       p.pivot.rotation.y = p.currentAngle;
 
       // 2. Continuous Axial Rotation on its own tilted axis (Earth-like daily spin)
-      p.planetMesh.rotation.y += cfg.rotationSpeed * dt * 0.8;
+      p.planetMesh.rotation.y += cfg.rotationSpeed * this.timeScale * dt * 0.8;
 
       // 3. Moon revolution if applicable
       if (p.moonPivot) {
