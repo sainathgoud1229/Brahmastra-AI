@@ -1,6 +1,6 @@
 /**
  * ModeSwitcher — the dock/tab bar at the bottom of the screen
- * that lets users switch between HOME and all 4 real-life modes.
+ * that lets users switch between HOME and real-life modes.
  */
 
 import type { AppMode } from './ModeManager';
@@ -17,7 +17,7 @@ export class ModeSwitcher {
     this.el.setAttribute('role', 'tablist');
     this.el.setAttribute('aria-label', 'Application Modes');
 
-    const modes: AppMode[] = ['HOME', 'REHAB', 'PANEL', 'SIGN', 'SLIDES'];
+    const modes: AppMode[] = ['HOME', 'REHAB', 'PANEL', 'PHOTO', 'SLIDES'];
     for (const mode of modes) {
       const meta = MODE_META[mode];
       const btn = document.createElement('button');

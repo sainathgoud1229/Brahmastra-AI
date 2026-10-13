@@ -3,7 +3,7 @@
  * Each mode has its own overlay panel rendered on top of the 3D scene.
  */
 
-export type AppMode = 'HOME' | 'REHAB' | 'PANEL' | 'SIGN' | 'SLIDES';
+export type AppMode = 'HOME' | 'REHAB' | 'PANEL' | 'PHOTO' | 'SLIDES';
 
 export interface ModeChangeEvent {
   from: AppMode;
@@ -13,11 +13,11 @@ export interface ModeChangeEvent {
 type ModeListener = (event: ModeChangeEvent) => void;
 
 export const MODE_META: Record<AppMode, { label: string; icon: string; desc: string }> = {
-  HOME:   { label: 'BRAHMASTRA AI',         icon: '🪐', desc: 'Neural Intelligence Core' },
-  REHAB:  { label: 'REHAB TRACKER',         icon: '🏥', desc: 'Hand Rehabilitation & 1-Min Cadence' },
-  PANEL:  { label: 'CONTROL CONSOLE',       icon: '🎛️', desc: 'Real Touchless System Console' },
-  SIGN:   { label: 'AIR NOTEBOOK & VOICE',  icon: '📓', desc: 'Mid-Air Writing & Speech Pronunciation' },
-  SLIDES: { label: 'PRESENTATION DECK',     icon: '🎤', desc: 'Keynote Stage & Gesture Controller' },
+  HOME:   { label: 'BRAHMASTRA AI',     icon: '🪐', desc: 'Neural Intelligence Core' },
+  REHAB:  { label: 'REHAB TRACKER',     icon: '🏥', desc: 'Hand Rehabilitation & 1-Min Cadence' },
+  PANEL:  { label: 'CONTROL CONSOLE',   icon: '🎛️', desc: 'Real Touchless System Console' },
+  PHOTO:  { label: 'AIR SHUTTER STUDIO',icon: '📸', desc: 'Touchless Hands-Free Photo Studio' },
+  SLIDES: { label: 'PRESENTATION DECK', icon: '🎤', desc: 'Keynote Stage & Gesture Controller' },
 };
 
 export class ModeManager {
@@ -38,7 +38,7 @@ export class ModeManager {
   }
 
   cycle(dir: 1 | -1): AppMode {
-    const modes: AppMode[] = ['HOME', 'REHAB', 'PANEL', 'SIGN', 'SLIDES'];
+    const modes: AppMode[] = ['HOME', 'REHAB', 'PANEL', 'PHOTO', 'SLIDES'];
     const idx = modes.indexOf(this.current);
     const next = modes[(idx + dir + modes.length) % modes.length];
     this.set(next);

@@ -38,7 +38,7 @@ import { ModeManager, MODE_META } from './modes/ModeManager';
 import { ModeSwitcher } from './modes/ModeSwitcher';
 import { RehabMode } from './modes/RehabMode';
 import { ControlPanelMode } from './modes/ControlPanelMode';
-import { SignLanguageMode } from './modes/SignLanguageMode';
+import { PhotoStudioMode } from './modes/PhotoStudioMode';
 import { PresentationMode } from './modes/PresentationMode';
 import type { AppMode } from './modes/ModeManager';
 
@@ -77,7 +77,7 @@ class Application {
   private readonly modeSwitcher: ModeSwitcher;
   private readonly rehabMode = new RehabMode();
   private readonly panelMode = new ControlPanelMode();
-  private readonly signMode = new SignLanguageMode();
+  private readonly photoMode = new PhotoStudioMode();
   private readonly slidesMode = new PresentationMode();
 
   private lastFrameTime = 0;
@@ -159,8 +159,16 @@ class Application {
     // Build real-life mode overlays
     this.rehabMode.build(ui);
     this.panelMode.build(ui);
-    this.signMode.build(ui);
+    this.photoMode.build(ui);
     this.slidesMode.build(ui);
+
+    // Bridge webcam & canvas into PhotoStudioMode
+    this.photoMode.setBridge({
+      getVideoElement: () => (this.tracker.isEnabled ? this.tracker.feed.video : null),
+      isCameraActive: () => this.tracker.isEnabled,
+      toggleCamera: () => this.toggleCamera(),
+      getCanvasElement: () => this.canvas,
+    });
 
     // Bridge real controls into ControlPanelMode
     this.panelMode.setBridge({
@@ -213,7 +221,7 @@ class Application {
       this.modeSwitcher.setActive(to);
       this.rehabMode.setVisible(to === 'REHAB');
       this.panelMode.setVisible(to === 'PANEL');
-      this.signMode.setVisible(to === 'SIGN');
+      this.photoMode.setVisible(to === 'PHOTO');
       this.slidesMode.setVisible(to === 'SLIDES');
     });
 
@@ -698,7 +706,7 @@ class Application {
     const modeHands = this.adapter.current as import('./interaction/InputTypes').InputHand[];
     if (currentMode === 'REHAB')  this.rehabMode.update(dt, modeHands);
     if (currentMode === 'PANEL')  this.panelMode.update(dt, modeHands);
-    if (currentMode === 'SIGN')   this.signMode.update(dt, modeHands);
+    if (currentMode === 'PHOTO')  this.photoMode.update(dt, modeHands);
     if (currentMode === 'SLIDES') this.slidesMode.update(dt, modeHands);
 
     this.updateHud(dt, systemGesture, usingCamera);
@@ -844,7 +852,7 @@ class Application {
     this.renderer.dispose();
     this.rehabMode.dispose();
     this.panelMode.dispose();
-    this.signMode.dispose();
+    this.photoMode.dispose();
     this.slidesMode.dispose();
     this.ui.replaceChildren();
   }

@@ -98,11 +98,12 @@ Brahmastra AI includes 4 zero-hardware, webcam-powered real-world modules access
 * **Tactile Air Switches**: Pinch in mid-air to toggle **Fullscreen Mode** (`requestFullscreen`), **Audio Synthesizer**, **9 Planetary Orbits**, **Top-Down Celestial View**, and **High Contrast**.
 * **Live System Telemetry**: Real-time FPS, input modality, and audio bus telemetry.
 
-### 3. 📓 Touchless Air-Notebook & Speech Voice (`src/modes/SignLanguageMode.ts`)
-* **Ruled Notebook Aesthetic**: Classical ruled notebook paper with horizontal blue lines, vertical red margin, and mid-air ink drawing.
-* **Sensorless Air-Writing**: Point index finger or pinch in mid-air to write words, letters, and cursive freely using webcam tracking.
-* **Practice Mode with Guidelines**: Full word practice with dashed tracing guidelines (`HELLO`, `BRAHMASTRA`, `WELCOME`, `THANK YOU`, `PHYSICAL AI`).
-* **🔊 Loud Speech Pronunciation**: Touch or click the **PRONOUNCE** button to trigger the browser's Web Speech Synthesis API (`SpeechSynthesisUtterance`), loudly speaking what was written in the notebook.
+### 3. 📸 Touchless Air-Shutter Photo Studio (`src/modes/PhotoStudioMode.ts`)
+* **🖐️ Open Palm 3-Second Countdown**: Show an open palm (4+ fingers) to trigger an audible, glowing 3s countdown with countdown tones (`3... 2... 1... SNAP!`).
+* **✌️ Instant Peace-Sign Shutter**: Flash the classic victory/peace sign (`✌️`) in mid-air to trigger an immediate snapshot.
+* **✊ Fist Cancel**: Clench your fist during countdown to instantly abort the shutter.
+* **Cinematic Viewfinder & Filters**: Sci-Fi camera HUD brackets, center reticle, rule-of-thirds grid, and 5 instant filters (*Normal*, *Cyber Cyan*, *Neon Matrix*, *Mono Noir*, *Golden Hour*).
+* **High-Tech Watermark & Instant Filmstrip**: Automatically applies a Brahmastra AI timestamped watermark; photos land on a live filmstrip for one-click downloading.
 
 ### 4. 🎤 Stage Keynote Presentation Controller (`src/modes/PresentationMode.ts`)
 * **Full Interactive Slide Deck**: 5 keynote presentation slides detailing Brahmastra AI's vision, neural architecture, and zero-hardware advantage.
